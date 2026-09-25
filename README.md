@@ -2,7 +2,7 @@
 
 Сайт конференции [SnowOne](https://snowone.ru/) — Content-First Java-конференции из Сибири (JUGNsk).
 
-Сайт статический и собирается [Hugo](https://gohugo.io/) из Markdown/YAML-файлов этого репозитория. Он публикуется в GitHub Pages на каждый пуш в `main`. Внешний вид повторяет прежний сайт на платформе JUG Ru Group: в шаблонах используются её стили.
+Сайт статический и собирается [Hugo](https://gohugo.io/) из Markdown/YAML-файлов этого репозитория. Он публикуется в GitHub Pages на каждый пуш в `main`. Внешний вид повторяет прежний сайт, который работал на прежней системе: в шаблонах используются её стили.
 
 ## Быстрый старт
 
@@ -83,7 +83,7 @@ make import-cfp FILE=export.xlsx ARGS="--only 12,15"      # только при�
 
 | Путь | Что это |
 |---|---|
-| `tools/mirror.py`, `tools/postprocess.py` | снятие копии и отвязка от инфраструктуры JUG Ru |
+| `tools/mirror.py`, `tools/postprocess.py` | снятие копии и отвязка от инфраструктуры прежней системы |
 | `tools/import_nextdata.py` | разовый перенос данных сезона 2026 из копии в `content/` и `data/` |
 | `tools/freeze_archive.py` | копирует архив из `snapshot/` в `static/` |
 | `tools/check_refs.py` | проверка целостности контента (запускается в CI) |
