@@ -1,5 +1,5 @@
 # Загружает слайды докладов в GitHub Releases: один релиз на год (slides-<год>).
-# Список файлов — docs/slides.json (его генерирует tools/postprocess.py).
+# Список файлов — docs/slides.json: год, имя файла в релизе, исходная ссылка.
 # Уже загруженные файлы пропускаются, поэтому workflow можно запускать повторно.
 name: Slides to Releases
 

@@ -7,5 +7,5 @@
 /resources/_gen/
 .hugo_build.lock
 __pycache__/
-# Копия старого сайта: хранится в ветке source-snapshot; локально пересоздаётся make snapshot
+# Копия прежнего сайта (ветка source-snapshot), если достать её локально
 /snapshot/

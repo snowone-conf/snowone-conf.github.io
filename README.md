@@ -79,18 +79,15 @@ make import-cfp FILE=export.xlsx ARGS="--only 12,15"      # только при�
 
 **Статус сезона:** `status` в `data/conference.yaml` (`announced` | `open` | `finished`). При `finished` на главной показывается плашка «Мероприятие завершилось».
 
-## Служебное (переезд со старой платформы)
+## Служебные скрипты
 
 | Путь | Что это |
 |---|---|
-| `tools/mirror.py`, `tools/postprocess.py` | снятие копии и отвязка от инфраструктуры прежней системы |
-| `tools/import_nextdata.py` | разовый перенос данных сезона 2026 из копии в `content/` и `data/` |
-| `tools/freeze_archive.py` | копирует архив из `snapshot/` в `static/` |
 | `tools/check_refs.py` | проверка целостности контента (запускается в CI) |
 | `tools/import_cfp.py`, `tools/cfp_mapping.yaml` | импорт заявок CFP из Яндекс Форм |
-| `docs/slides.json`, workflow `Slides to Releases` | перенос слайдов в GitHub Releases |
+| `docs/slides.json`, workflow `Slides to Releases` | загрузка слайдов в GitHub Releases |
 
-Полная копия старого сайта (`snapshot/`) из `main` удалена: для сборки она не нужна. Она сохранена в ветке [`source-snapshot`](../../tree/source-snapshot). Скрипты переноса читают её из папки `snapshot/`: чтобы запустить их снова, достаньте копию из ветки (`git archive origin/source-snapshot snapshot | tar -x` — так файлы не попадут в индекс) или снимите заново (`make snapshot`).
+Архив прошлых лет в `static/archive/` — готовые страницы прежнего сайта, их не нужно редактировать. Копия прежнего сайта сохранена в ветке [`source-snapshot`](../../tree/source-snapshot).
 
 ## Публикация
 
