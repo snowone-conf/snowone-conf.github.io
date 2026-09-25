@@ -1,0 +1,66 @@
+{{ define "main" }}
+{{- $conf := hugo.Data.conference -}}
+{{- $talks := where (where site.RegularPages "Section" "talks") "Params.season" $conf.season -}}
+<div class="ScheduleContent_scheduleContent__2fL5a">
+  <div class="ScheduleContent_scheduleContent__container__DcQGC">
+    <div class="ScheduleContent_scheduleContent__header__DdSYt">
+      <h1 class="ScheduleContent_scheduleContent__title__fXkIE">{{ .Title }}</h1>
+    </div>
+    <div class="ScheduleContent_scheduleContent__toolbar__ngpUq">
+      <nav class="ScheduleContent_scheduleContent__navigation__BwZW_">
+        <ol class="ScheduleDays_scheduleDays__list__EE6e_">
+          {{- range $i, $d := $conf.days }}
+          {{- $date := time $d.date }}
+          <li class=""><a class="ScheduleDays_scheduleDays__link__Ppl9v" href="#day-{{ add $i 1 }}"><span class="ScheduleDays_scheduleDays__date__adAoH">{{ $date.Day }} {{ T (printf "month%d" (int $date.Month)) }}</span></a></li>
+          {{- end }}
+        </ol>
+      </nav>
+      <div class="ScheduleContent_scheduleContent__actions__STQnR">
+        {{- with $conf.program_pdf }}
+        <a class="ScheduleDownload_scheduleDownload__r4wYH" href="{{ . }}" target="_blank"><span class="">Скачать расписание</span><svg width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#pdf"></use></svg></a>
+        {{- end }}
+      </div>
+    </div>
+    <div>
+      <ol class="ScheduleTalksByDays_scheduleTalksByDays__list__X60F_">
+        {{- range $i, $d := $conf.days }}
+        {{- $day := add $i 1 -}}
+        {{- $date := time $d.date -}}
+        {{- $dayTalks := sort (where $talks "Params.day" $day) "Params.start" -}}
+        {{- /* Границы слотов: все начала и концы докладов дня */ -}}
+        {{- $bounds := slice -}}
+        {{- $starts := slice -}}
+        {{- range $dayTalks }}
+          {{- $s := (time .Params.start).Format "15-04" }}{{ $e := (time .Params.end).Format "15-04" -}}
+          {{- $bounds = $bounds | append $s $e }}{{ $starts = $starts | append $s -}}
+        {{- end -}}
+        {{- $bounds = sort (uniq $bounds) -}}
+        {{- $rows := slice "[tracks] auto" -}}
+        {{- range $bounds }}{{ $rows = $rows | append (printf "[time_%s] minmax(%s, auto)" . (cond (in $starts .) "120px" "20px")) }}{{ end -}}
+        {{- $cols := slice "48px" -}}
+        {{- range $d.tracks }}{{ $cols = $cols | append (printf "[track-%d] minmax(248px,1fr)" .number) }}{{ end -}}
+        {{- $cols = $cols | append "48px" }}
+        <li class="ScheduleTalksByDays_scheduleTalksByDays__item__i9Qt0" id="day-{{ $day }}">
+          <div class="ScheduleTalksByDays_scheduleTalksByDays__header__Ay22w">
+            <h2 class="ScheduleTalksByDays_scheduleTalksByDays__title__deWfT"><span class="ScheduleTalksByDays_scheduleTalksByDays__date__l6pzr">{{ $date.Day }} {{ T (printf "month%d" (int $date.Month)) }}</span></h2>
+          </div>
+          <div class="ScheduleTable_scheduleTable__j4icP" style="{{ printf "--template-columns:%s;--template-rows:%s" (delimit $cols " ") (delimit $rows " ") | safeCSS }}">
+            {{- range $d.tracks }}
+            <span class="ScheduleTable_scheduleTable__track__GrjA7" style="{{ printf "--column:track-%d;--row:tracks" (int .number) | safeCSS }}" aria-hidden="true">{{ .title }}</span>
+            {{- end }}
+            {{- range $bounds }}
+            {{- $hm := replace . "-" ":" }}
+            <time class="ScheduleTable_scheduleTable__timeslot__wOt0K ScheduleTableTimeslot_scheduleTableTimeslot__dF4_E" data-time="{{ $hm }}" data-type="{{ cond (in $starts .) "start" "end" }}" style="{{ printf "--row:time_%s" . | safeCSS }}">{{ $hm }}</time>
+            {{- end }}
+            {{- range $dayTalks }}
+            {{- $s := (time .Params.start).Format "15-04" }}{{ $e := (time .Params.end).Format "15-04" }}
+            {{ partial "talk-card.html" (dict "page" . "class" "ScheduleTable_scheduleTable__card__5E_f3 ScheduleTable_scheduleTable__card_talk__ywxL_" "style" (printf "--column:track-%d;--row:time_%s / time_%s" (int (.Params.track | default 1)) $s $e)) }}
+            {{- end }}
+          </div>
+        </li>
+        {{- end }}
+      </ol>
+    </div>
+  </div>
+</div>
+{{ end }}

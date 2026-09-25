@@ -1,0 +1,2 @@
+{{- $labels := dict "talk" "Доклад" "conversation" "Обсуждение" "workshop" "Воркшоп" "keynote" "Ключевой доклад" "service" "Служебное" -}}
+<span class="TalkType_talkType__t4CHk">{{ index $labels (.Params.format | default "talk") | default "Доклад" }}</span>

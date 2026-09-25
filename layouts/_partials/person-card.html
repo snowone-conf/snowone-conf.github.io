@@ -1,0 +1,10 @@
+{{- /* Карточка персоны в списках (главная, спикеры). Параметр: Page персоны. */ -}}
+<article class="PersonList_personList__card__vMy4H PersonCard_personCard__OFhEL" data-has-link="true">
+  {{ partial "avatar.html" (dict "person" . "size" 62 "class" "PersonCard_personCard__avatar__79hPV") }}
+  <div>
+    <h3 class="PersonCard_personCard__name__osiAC"><a data-link="true" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+    {{- with .Params.company }}
+    <p class="PersonCard_personCard__company__aVHAn"><span class="PersonCard_personCard__companyLabel__6fEBX">Компания: </span>{{ . }}</p>
+    {{- end }}
+  </div>
+</article>

@@ -1,0 +1,10 @@
+{{ define "main" }}
+<div class="SquidexContent_squidexContent__XuLJ_">
+  <div class="SquidexContent_squidexContent__container__XY3CO">
+    <div class="SquidexContent_squidexContent__text__Kb646">
+      {{- if not (strings.Contains .Content "<h1") }}<h1>{{ .Title }}</h1>{{ end }}
+      {{ .Content }}
+    </div>
+  </div>
+</div>
+{{ end }}

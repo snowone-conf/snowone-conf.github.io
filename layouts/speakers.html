@@ -1,0 +1,10 @@
+{{ define "main" }}
+<div class="PersonsContent_personsContent__VwRb9">
+  <div class="PersonsContent_personsContent__container__apg9u">
+    <h1 class="PersonsContent_personsContent__title__B8Zko">{{ .Title }}</h1>
+    <ul class="PersonList_personList__ydHvl">
+      {{- range partial "season-speakers.html" . }}<li>{{ partial "person-card.html" . }}</li>{{ end }}
+    </ul>
+  </div>
+</div>
+{{ end }}

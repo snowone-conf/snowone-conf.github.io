@@ -1,0 +1,5 @@
+{{- /* Плашка с иконкой. Параметры: dict "class" "important" (bool) "html" */ -}}
+<div class="{{ .class }} WarningBlock_warningBlock__H2OSi" data-important="{{ .important | default false }}">
+  <svg class="WarningBlock_warningBlock__icon__WZFMp" width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#info"></use></svg>
+  <div class="WarningBlock_warningBlock__content__eDDNm">{{ .html | safeHTML }}</div>
+</div>

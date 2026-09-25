@@ -1,0 +1,27 @@
+{{- /* Карточка доклада. Параметр: Page доклада или dict "page" "class" "style". */ -}}
+{{- $class := "TalksList_talksList__card__SncRE" -}}
+{{- $style := "" -}}
+{{- $p := . -}}
+{{- if reflect.IsMap . }}{{ $p = .page }}{{ $class = .class }}{{ $style = .style }}{{ end -}}
+{{- with $p -}}
+<article class="{{ $class }} TalkCard_talkCard__IAiMl" data-has-link="true"{{ with $style }} style="{{ . | safeCSS }}"{{ end }}>
+  <div class="TalkCard_talkCard__header__4k8Ga"></div>
+  <div class="TalkCard_talkCard__main__FzBQH">
+    <div class="TalkCard_talkCard__properties__mszHE">
+      {{ partial "talk-type.html" . }}
+      <div class="TalkCard_talkCard__badges__xPdGv">
+        {{- with .Params.hall }}<span class="TalkCard_talkCard__hall__zzZ3X TalkHall_talkHall__1ssxP" data-talk-hall="true">{{ . }}</span>{{ end }}
+      </div>
+    </div>
+    <h3 class="TalkCard_talkCard__title__hMDtr"><a data-link="true" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+    {{- with partial "talk-people.html" . }}
+    <ul class="TalkCard_talkCard__speakers__4lQ8o TalkSpeakers_talkSpeakers__YFzXZ">
+      {{- range . }}<li class="TalkSpeakers_talkSpeakers__item__M8YOM">{{ partial "speaker-card.html" . }}</li>{{ end }}
+    </ul>
+    {{- end }}
+  </div>
+  <div class="TalkCard_talkCard__footer__TOlqD">
+    <ul class="TalkCard_talkCard__info__310V7 TalkInfo_talkInfo__gUUyn">{{ partial "talk-lang.html" . }}</ul>
+  </div>
+</article>
+{{- end -}}

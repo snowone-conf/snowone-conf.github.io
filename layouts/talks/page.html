@@ -1,0 +1,59 @@
+{{ define "main" }}
+{{- $start := time .Params.start -}}
+{{- $end := time .Params.end -}}
+<div class="TalkContent_talkContent__Qs0__">
+  <div class="TalkContent_talkContent__container__Zrl_K">
+    <div class="TalkContent_talkContent__states__enoaN"></div>
+    <div class="TalkContent_talkContent__columns__FDoWG">
+      <div>
+        <div class="TalkContent_talkContent__header___RsDS">
+          {{ partial "talk-type.html" . }}
+          {{- if .Params.start }}
+          <time class="TalkContent_talkContent__dateTime__HVbZU" datetime="{{ $start.Format "2006-01-02T15:04:05Z07:00" }}">
+            <span><span class="TalkDateTime_talkDateTime__label__LGoxI">Дата: </span>{{ $start.Format "02.01" }} / </span>
+            <span><span class="TalkDateTime_talkDateTime__label__LGoxI">Начало: </span>{{ $start.Format "15:04" }} – <span class="TalkDateTime_talkDateTime__label__LGoxI">Конец: </span>{{ $end.Format "15:04" }}</span>
+            <span class="TalkDateTime_talkDateTime__timezone__PGkDo">(Новосибирск)</span>
+          </time>
+          {{- end }}
+        </div>
+        <h1 class="TalkContent_talkContent__title__pNIAm">{{ .Title }}</h1>
+        <div class="TalkContent_talkContent__about__nvB8i">
+          <div class="TalkContent_talkContent__properties__xawzP">
+            <ul class="TalkInfo_talkInfo__gUUyn">{{ partial "talk-lang.html" . }}</ul>
+          </div>
+          <div class="TalkContent_talkContent__actions__YdMTW">
+            {{- with .Params.slides }}
+            <a class="TalkMaterials_talkMaterials__link__9C2vJ" href="{{ . }}" rel="noreferrer noopener" target="_blank"><span>Презентация</span> <span class="TalkMaterialsLink_talkMaterialsLink__fileType__4WZP3">{{ path.Ext . | strings.TrimPrefix "." | default "pdf" }}</span></a>
+            {{- end }}
+            {{- range .Params.video }}
+            <a class="TalkMaterials_talkMaterials__link__9C2vJ" href="{{ . }}" rel="noreferrer noopener" target="_blank"><span>Видео</span></a>
+            {{- end }}
+          </div>
+        </div>
+        <div class="TalkContent_talkContent__description__zY75F">{{ .Content }}</div>
+      </div>
+      <div class="TalkContent_talkContent__rightColumn__oMp7X">
+        {{- with partial "talk-people.html" . }}
+        <div>
+          <h2 class="TalkContent_talkContent__subtitle__fZ0NM">Спикеры</h2>
+          <ul class="PersonList_personList__ydHvl">
+            {{- range . }}
+            <li>
+              <article class="PersonList_personList__card__vMy4H PersonCard_personCard__OFhEL" data-has-link="true" data-large-size="true">
+                {{ partial "avatar.html" (dict "person" . "size" 74 "class" "PersonCard_personCard__avatar__79hPV") }}
+                <div>
+                  <h3 class="PersonCard_personCard__name__osiAC"><a data-link="true" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+                  {{- with .Params.company }}<p class="PersonCard_personCard__company__aVHAn"><span class="PersonCard_personCard__companyLabel__6fEBX">Компания: </span>{{ . }}</p>{{ end }}
+                </div>
+              </article>
+            </li>
+            {{- end }}
+          </ul>
+        </div>
+        {{- end }}
+      </div>
+    </div>
+    <a class="TalkContent_talkContent__back__bakjP" href="/schedule/days/">Расписание</a>
+  </div>
+</div>
+{{ end }}

@@ -1,0 +1,44 @@
+{{- $conf := hugo.Data.conference -}}
+{{- $title := .Title -}}
+{{- if .IsHome -}}
+  {{- $title = printf "%s. %s" $conf.title $conf.description -}}
+{{- else if .Params.seoTitle -}}
+  {{- $title = .Params.seoTitle -}}
+{{- else -}}
+  {{- $title = printf "%s | %s" $conf.title .Title -}}
+{{- end -}}
+{{- $desc := .Params.description | default (printf "%s — %s" $conf.title $conf.description) -}}
+{{- $og := .Params.ogImage | default "/img/site/snowone-og-ru.jpg" -}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ $title }}</title>
+<meta name="title" content="{{ $title }}">
+<meta name="description" content="{{ $desc | plainify }}">
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ $desc | plainify }}">
+<meta property="og:site_name" content="{{ $conf.title }}. {{ $conf.description }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:image" content="{{ $og | absURL }}">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $title }}">
+<meta name="twitter:description" content="{{ $desc | plainify }}">
+<meta name="twitter:image" content="{{ $og | absURL }}">
+<link rel="canonical" href="{{ .Permalink }}">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/conference/snowone/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/conference/snowone/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/conference/snowone/favicon/favicon-16x16.png">
+<link rel="manifest" href="/img/conference/snowone/favicon/site.webmanifest">
+<meta name="theme-color" content="#010a12">
+<link rel="preload" href="/fonts/golos/400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/golos/700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/roboto/400.woff2" as="font" type="font/woff2" crossorigin>
+{{- /* Стили платформы (CSS-модули Next.js в порядке каскада) + свои правки */ -}}
+{{- $css := slice -}}
+{{- range (resources.Match "css/platform/*.css") -}}{{- $css = $css | append . -}}{{- end -}}
+{{- with resources.Get "css/site.css" -}}{{- $css = $css | append . -}}{{- end -}}
+{{- with $css | resources.Concat "css/main.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+{{- end }}
+{{ partial "analytics.html" . }}

@@ -1,0 +1,53 @@
+# Настройки сайта SnowOne. Данные сезона (даты, площадка, статистика) — в data/conference.yaml.
+baseURL: https://snowone-conf.github.io/
+title: SnowOne
+defaultContentLanguage: ru
+defaultContentLanguageInSubdir: false
+# Английская версия появится, когда будут переведены общие тексты.
+# Переводы докладов и докладчиков уже лежат рядом (index.en.md).
+disableLanguages: [en]
+languages:
+  ru:
+    label: Русский
+    locale: ru-RU
+    weight: 1
+  en:
+    label: English
+    locale: en-US
+    weight: 2
+
+enableRobotsTXT: true
+disableKinds: [taxonomy, term, rss]
+uglyURLs: false
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true   # тексты перенесены из старой CMS в виде HTML
+
+params:
+  # Билеты: mode = link (кнопка-ссылка) | widget (виджет Timepad) | off
+  tickets:
+    mode: off
+    url: ""            # страница события на Timepad
+    timepadEventId: "" # для mode: widget
+  # Приём докладов (CFP)
+  cfp:
+    open: true
+    url: "mailto:support@snowone.ru?subject=SnowOne%20CFP"  # позже — ссылка на Яндекс Форму
+  # Подписка на новости (форма JUG Ru не работает — ведём в Telegram-канал)
+  subscription:
+    url: https://t.me/snowone_news
+  # Своя аналитика: номер счётчика Яндекс Метрики. Пусто — аналитики нет.
+  yandexMetrikaId: ""
+
+menus:
+  main:
+    - {name: Расписание, url: /schedule/days/, weight: 10}
+    - {name: Спикеры, url: /speakers/, weight: 20}
+    - {name: Партнеры, url: /partners/, weight: 30}
+    - {name: О нас, url: /organizers/, weight: 40}
+    - {name: Архив, url: /archive/, weight: 50}
+    - {name: Code of Conduct, url: /coc/, weight: 60}
+    - {name: Правила участия, url: /rules/, weight: 70}
+    - {name: Правовые документы, url: /legal/, weight: 80}

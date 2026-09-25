@@ -1,0 +1,10 @@
+{{- /* Небольшая карточка докладчика внутри карточки доклада. Параметр: Page персоны. */ -}}
+<article class="SpeakerCard_speakerCard___kzZ6" data-small="false">
+  {{ partial "avatar.html" (dict "person" . "size" 44 "class" "SpeakerCard_speakerCard__avatar__4pJqR") }}
+  <div class="SpeakerCard_speakerCard__info__XlImm">
+    <h4 class="SpeakerCard_speakerCard__name__XaPEz"><a class="SpeakerCard_speakerCard__link__5SNp9" href="{{ .RelPermalink }}">{{ .Title }}</a></h4>
+    {{- with .Params.company }}
+    <p class="SpeakerCard_speakerCard__company__GfpI2"><span class="SpeakerCard_speakerCard__companyLabel__rJsGB">Компания: </span>{{ . }}</p>
+    {{- end }}
+  </div>
+</article>

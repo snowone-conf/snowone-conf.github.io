@@ -1,0 +1,4 @@
+---
+title: Расписание
+layout: schedule
+---

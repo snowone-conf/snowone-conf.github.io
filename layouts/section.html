@@ -1,0 +1,11 @@
+{{ define "main" }}
+<div class="SquidexContent_squidexContent__XuLJ_">
+  <div class="SquidexContent_squidexContent__container__XY3CO">
+    <div class="SquidexContent_squidexContent__text__Kb646">
+      <h1>{{ .Title }}</h1>
+      {{ .Content }}
+      <ul>{{ range .Pages }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>{{ end }}</ul>
+    </div>
+  </div>
+</div>
+{{ end }}

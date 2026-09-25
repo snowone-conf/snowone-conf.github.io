@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Locale | default "ru" }}">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body class="page">
+  <div class="Layout_layout__Y_I1h">
+    {{ partial "header.html" . }}
+    <main class="Layout_layout__main__iqdrT" id="main__anchor">
+      {{ block "main" . }}{{ end }}
+    </main>
+    {{ partial "footer.html" . }}
+    <svg class="Layout_layout__gradientSvg__27Ms8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" aria-hidden="true" focusable="false"><linearGradient id="color-gradient" x1="0%" y1="0%" x2="0" y2="100%"><stop offset="0%" stop-color="#beddf6"></stop><stop offset="100%" stop-color="#2e679e"></stop></linearGradient></svg>
+  </div>
+  {{ partial "cookie-banner.html" . }}
+  {{ with resources.Get "js/site.js" | js.Build (dict "minify" true) | fingerprint }}
+  <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" defer></script>
+  {{ end }}
+</body>
+</html>

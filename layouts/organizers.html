@@ -1,0 +1,24 @@
+{{ define "main" }}
+{{- $support := hugo.Data.conference.contacts.support -}}
+<div class="OrganizersContent_organizersContent__smBb6">
+  <div class="OrganizersContent_organizersContent__container__G8k1D">
+    <div class="OrganizersContent_organizersContent__info__mz1iV">
+      <div class="OrganizersContent_organizersContent__leftColumn__t7ueq">
+        <img class="OrganizersContent_organizersContent__logo__YMbjq" src="{{ .Params.logo }}" alt="{{ .Params.organizer }}" width="400" height="400">
+      </div>
+      <div class="OrganizersContent_organizersContent__rightColumn__MLsDb">
+        <h1 class="OrganizersContent_organizersContent__title__KscSE">{{ .Params.organizer }}</h1>
+        {{ partial "warning.html" (dict "class" "OrganizersContent_organizersContent__support__QpevM" "html" (printf "<p>Возникли вопросы? Пишите на <a href=\"mailto:%s\">%s</a></p>" $support $support)) }}
+        <p class="OrganizersContent_organizersContent__text__itOmL">{{ .RawContent | strings.TrimSpace }}</p>
+        {{- with .Params.link }}
+        <div class="OrganizersContent_organizersContent__links__vq_x4"><a class="OrganizersContent_organizersContent__link__3PlL2" href="{{ . }}" target="_blank" aria-label="Перейти на веб-сайт {{ $.Params.organizer }}"><svg width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#website"></use></svg></a></div>
+        {{- end }}
+      </div>
+    </div>
+    <section class="OrganizersContent_organizersContent__committee__ibjuv" id="committee">
+      <h2 class="Committee_committee__title__5wlC1">Программный комитет</h2>
+      {{ partial "committee.html" . }}
+    </section>
+  </div>
+</div>
+{{ end }}

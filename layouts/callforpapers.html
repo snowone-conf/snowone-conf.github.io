@@ -1,0 +1,47 @@
+{{ define "main" }}
+<div class="CallforpapersContent_callforpapersContent__9ac97">
+  <div class="CallforpapersContent_callforpapersContent__container__kmO80">
+    <section class="CallforpapersContent_callforpapersContent__banner__O4SQH CallforpapersBanner_callforpapersBanner__mtNN_" style="--bgImage:url(/img/site/cfp-snowone.svg)">
+      <h1 class="CallforpapersBanner_callforpapersBanner__title__BGIFf">{{ .Title }}</h1>
+      <p class="CallforpapersBanner_callforpapersBanner__subtitle__4YiNU">{{ .Params.subtitle }}</p>
+      <div class="CallforpapersBanner_callforpapersBanner__links__Lkcda">
+        <div class="">{{ partial "cfp-submit.html" . }}</div>
+        {{- with .Params.ask }}
+        <a class="CallforpapersBanner_callforpapersBanner__link__6jt4c" href="{{ .url }}" rel="noreferrer noopener" target="_blank"><span>{{ .title }}</span></a>
+        {{- end }}
+      </div>
+    </section>
+    {{- with .Params.topics }}
+    <section class="CallforpapersContent_callforpapersContent__topics__E0Lb6" id="topics">
+      <h2 class="CallforpapersTopics_callforpapersTopics__title__7qcP5">Нам интересны следующие темы</h2>
+      {{- with $.Params.topics_note }}{{ partial "warning.html" (dict "class" "CallforpapersTopics_callforpapersTopics__text__mv_73" "important" true "html" (printf "<p>%s</p>" .)) }}{{ end }}
+      <ul class="CallforpapersTopics_callforpapersTopics__categoryList__6zzUW">
+        {{- range . }}
+        <li>
+          <details class="DetailsBlock_detailsBlock__E0Mr1" open>
+            <summary class="CallforpapersTopics_callforpapersTopics__detailsSummary__7C1Xm DetailsBlock_detailsBlock__summary__Stjl0">{{ .title }}</summary>
+            <div class="CallforpapersTopics_callforpapersTopics__detailsContent__d3BuB DetailsBlock_detailsBlock__content__oMPF6">
+              <ul class="CallforpapersTopics_callforpapersTopics__list__Ovxyw">{{ range .items }}<li>{{ . }}</li>{{ end }}</ul>
+            </div>
+          </details>
+        </li>
+        {{- end }}
+      </ul>
+    </section>
+    {{- end }}
+    <section class="CallforpapersContent_callforpapersContent__archive__pK_26 CallforpapersArchive_callforpapersArchive__UxF8Z">
+      <h2 class="CallforpapersArchive_callforpapersArchive__title__zyoSr">Архив</h2>
+      <svg class="CallforpapersArchive_callforpapersArchive__icon__vFsK7" width="40" height="40" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#history"></use></svg>
+      <p class="CallforpapersArchive_callforpapersArchive__text__HtAG0">Посмотрите, что было на прошедших конференциях SnowOne</p>
+      <a class="CallforpapersArchive_callforpapersArchive__link__2w7Om" href="/archive/" target="_blank">Смотреть</a>
+    </section>
+    <section class="CallforpapersContent_callforpapersContent__committee___HM3s" id="committee">
+      <div class="CallforpapersCommittee_callforpapersCommittee__list__WnJte">
+        <h2 class="Committee_committee__title__5wlC1">Программный комитет</h2>
+        {{ partial "committee.html" . }}
+      </div>
+      <div class="CallforpapersCommittee_callforpapersCommittee__link__kTNAq">{{ partial "cfp-submit.html" . }}</div>
+    </section>
+  </div>
+</div>
+{{ end }}

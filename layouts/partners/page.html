@@ -1,0 +1,26 @@
+{{ define "main" }}
+<div class="PartnerContent_partnerContent__EIZzp">
+  <div class="PartnerContent_partnerContent__container__6ZU8k">
+    <div class="PartnerContent_partnerContent__info__Z_B8_">
+      <div class="PartnerContent_partnerContent__leftColumn__XGIDh">
+        <div class="PartnerContent_partnerContent__logoWrapper__pYlxt">
+          {{- with .Resources.Get .Params.logo }}<img class="PartnerContent_partnerContent__logo__Rww5w" src="{{ .RelPermalink }}" alt="Логотип {{ $.Title }}" width="360" height="360">{{ end }}
+        </div>
+      </div>
+      <div class="PartnerContent_partnerContent__rightColumn__r1b8_">
+        <div class="PartnerContent_partnerContent__header__8U4pD">{{ partial "partner-tier.html" . }}</div>
+        <h1 class="PartnerContent_partnerContent__title__j4X_z">{{ .Title }}</h1>
+        <div class="PartnerContent_partnerContent__text__3JaI4">{{ .Content }}</div>
+        <ul class="PartnerContent_partnerContent__links__CdUUm PartnersLinks_partnersLinks__8wz0J">
+          {{- with .Params.link }}
+          <li><a class="PartnersLinks_partnersLinks__link_website___lpib" href="{{ . }}" aria-label="Веб-сайт {{ $.Title }}" rel="noreferrer noopener" target="_blank"><svg width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#website"></use></svg></a></li>
+          {{- end }}
+          {{- range .Params.buttons }}
+          <li><a class="PartnersLinks_partnersLinks__link_secondary__2ZZKz" href="{{ .url }}" rel="noreferrer noopener" target="_blank">{{ .title }}</a></li>
+          {{- end }}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{{ end }}

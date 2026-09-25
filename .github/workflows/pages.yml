@@ -1,10 +1,11 @@
-# Публикует статическую копию сайта (snapshot/) в GitHub Pages.
-# Когда появится Hugo-версия, здесь добавится шаг сборки.
+# Сборка сайта на Hugo и публикация в GitHub Pages.
+# На pull request — только сборка и проверки (без публикации).
 name: Deploy to GitHub Pages
 
 on:
   push:
     paths-ignore: [docs/**, "*.md"]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -13,22 +14,42 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Hugo
+        run: |
+          v=$(cat .hugo-version)
+          curl -fsSL -o /tmp/hugo.deb "https://github.com/gohugoio/hugo/releases/download/v${v}/hugo_extended_${v}_linux-amd64.deb"
+          sudo dpkg -i /tmp/hugo.deb
+          hugo version
+      - name: Check content
+        run: |
+          pip install --quiet pyyaml
+          python3 tools/check_refs.py
+      - id: pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+      - name: Build
+        run: hugo --gc --minify --panicOnWarning --baseURL "${{ steps.pages.outputs.base_url || 'https://snowone-conf.github.io' }}/"
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
   deploy:
     # Публикуем только из ветки по умолчанию, как бы она ни называлась.
-    if: github.ref_name == github.event.repository.default_branch
+    if: github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: snapshot
       - id: deployment
         uses: actions/deploy-pages@v4

@@ -1,0 +1,33 @@
+{{- $conf := hugo.Data.conference -}}
+{{- $labels := dict "youtube" "Ютуб" "twitter" "Икс" "telegram" "Телеграм" "vk" "ВКонтакте" -}}
+<footer class="Footer_footer__onhef">
+  <div class="Footer_footer__container__wZjkN">
+    <div class="Footer_footer__body__mLzTs">
+      <div class="Footer_footer__left__BxUmm">
+        <a class="Footer_footer__home__z8V4g" href="/"><img class="Footer_footer__logo__aIB9G Logo_logo__nBPJy" src="/img/site/snowone-footer-logo.svg" alt="{{ $conf.title }}" width="128" height="48" loading="lazy"></a>
+        <p class="Footer_footer__description__suC1z">{{ $conf.description }}</p>
+      </div>
+      <address class="Footer_footer__right__vKV67">
+        <p class="Footer_footer__company__L8U_c">{{ $conf.organizer }}</p>
+        <div class="Footer_footer__support__Z7lul">
+          <p class="SupportBlock_supportBlock__title__SKoLF">Нужна помощь?</p>
+          <ul class="SupportBlock_supportBlock__list__LORDZ">
+            {{- with site.GetPage "/faq" }}
+            <li class="SupportBlock_supportBlock__item__d2Gke"><svg class="SupportBlock_supportBlock__icon__MybLI" width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#info"></use></svg><a href="{{ .RelPermalink }}">FAQ</a></li>
+            {{- end }}
+            <li class="SupportBlock_supportBlock__item__d2Gke"><svg class="SupportBlock_supportBlock__icon__MybLI" width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#mail"></use></svg><a href="mailto:{{ $conf.contacts.support }}"><span class="SupportBlock_supportBlock__label__9bEM2">E-mail: </span>{{ $conf.contacts.support }}</a></li>
+            {{- with $conf.contacts.telegram }}
+            <li class="SupportBlock_supportBlock__item__d2Gke"><svg class="SupportBlock_supportBlock__icon__MybLI" width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#telegram"></use></svg><a target="_blank" href="{{ . }}"><span class="SupportBlock_supportBlock__label__9bEM2">Телеграм: </span>@{{ path.Base . }}</a></li>
+            {{- end }}
+          </ul>
+        </div>
+        <p class="Footer_footer__title__mrNEj" id="social-label">Мы в социальных сетях</p>
+        <ul class="Footer_footer__social__MEwa_ SocialMenu_socialMenu__oHKfi" aria-labelledby="social-label">
+          {{- range $conf.social }}
+          <li><a class="SocialMenu_socialMenu__link___ztNR" href="{{ .url }}" target="_blank"><span class="SocialMenu_socialMenu__label__k3G_5">{{ index $labels .name | default .name }}</span><svg width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#{{ .name }}"></use></svg></a></li>
+          {{- end }}
+        </ul>
+      </address>
+    </div>
+  </div>
+</footer>

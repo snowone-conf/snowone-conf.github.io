@@ -1,0 +1,34 @@
+{{- /* Список партнёров текущего сезона. Параметр: dict "heading" "h1"|"h2" */ -}}
+{{- $partners := where (where site.RegularPages "Section" "partners") "Params.season" hugo.Data.conference.season -}}
+{{- $h := .heading | default "h2" -}}
+{{- $cardH := cond (eq $h "h1") "h2" "h3" -}}
+{{- with $partners.ByWeight }}
+<div class="PartnersContent_partnersContent__container__PSJXM">
+  <div class="PartnersContent_partnersContent__header__BlMWR">
+    {{ printf "<%s class=\"PartnersContent_partnersContent__title__S_O4y\">Партнеры</%s>" $h $h | safeHTML }}
+  </div>
+  <ul class="PartnersContent_partnersContent__mainList__irGr_ PartnersList_partnersList__OGiNF" data-detailed="true">
+    {{- range . }}
+    <li class="PartnersList_partnersList__item__iTdTo">
+      <article class="PartnersList_partnersList__card__twoq4 PartnersCard_partnersCard__Fjt97 PartnersCard_partnersCard_large__IodBX" data-has-link="true">
+        <div class="PartnersCard_partnersCard__header__Ux7jw">{{ partial "partner-tier.html" . }}</div>
+        <div class="PartnersCard_partnersCard__logoWrapper___grhN">
+          {{ printf "<%s class=\"PartnersCard_partnersCard__title__n1M8F\">" $cardH | safeHTML }}
+            <a class="PartnersCard_partnersCard__link__Xv4k1" href="{{ .RelPermalink }}">
+              {{- with .Resources.Get .Params.logo }}<img class="PartnersCard_partnersCard__logo__awwrW" src="{{ .RelPermalink }}" alt="{{ $.Title }}" width="236" height="236" loading="lazy">{{ end -}}
+            </a>
+          {{ printf "</%s>" $cardH | safeHTML }}
+        </div>
+        {{- with .Params.buttons }}
+        <ul class="PartnersCard_partnersCard__links__KHmji PartnersCardLinks_partnersCardLinks__FEdsH">
+          {{- range . }}
+          <li class="PartnersCardLinks_partnersCardLinks__item__5ITcz"><a class="PartnersCardLinks_partnersCardLinks__link__o__jO" href="{{ .url }}" rel="noreferrer noopener" target="_blank">{{ .title }}</a></li>
+          {{- end }}
+        </ul>
+        {{- end }}
+      </article>
+    </li>
+    {{- end }}
+  </ul>
+</div>
+{{- end }}

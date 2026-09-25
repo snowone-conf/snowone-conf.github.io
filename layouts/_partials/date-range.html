@@ -1,0 +1,12 @@
+{{- /* «27–28 февраля» / «28 февраля – 1 марта». Параметр: dict "start" "end" (строки ISO). */ -}}
+{{- $s := time .start -}}
+{{- $e := time .end -}}
+{{- $sm := T (printf "month%d" (int $s.Month)) -}}
+{{- $em := T (printf "month%d" (int $e.Month)) -}}
+{{- if and (eq $s.Day $e.Day) (eq $s.Month $e.Month) -}}
+  {{- printf "%d %s" $s.Day $sm -}}
+{{- else if eq $s.Month $e.Month -}}
+  {{- printf "%d–%d %s" $s.Day $e.Day $sm -}}
+{{- else -}}
+  {{- printf "%d %s – %d %s" $s.Day $sm $e.Day $em -}}
+{{- end -}}

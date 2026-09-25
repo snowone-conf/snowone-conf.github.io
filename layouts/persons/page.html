@@ -1,0 +1,65 @@
+{{ define "main" }}
+{{- $id := .File.ContentBaseName -}}
+{{- $season := hugo.Data.conference.season -}}
+{{- $contactLabels := dict "github" "Гитхаб" "telegram" "Телеграм" "website" "Веб-сайт" "twitter" "Икс" "linkedin" "LinkedIn" "vk" "ВКонтакте" -}}
+{{- $talks := slice -}}
+{{- range sort (where (where site.RegularPages "Section" "talks") "Params.season" $season) "Params.start" -}}
+  {{- if or (in (.Params.speakers | default slice) $id) (in (.Params.hosts | default slice) $id) -}}{{- $talks = $talks | append . -}}{{- end -}}
+{{- end -}}
+<div class="PersonContent_personContent__js6yx">
+  <div class="PersonContent_personContent__container__IGWAq">
+    <div class="PersonContent_personContent__info__mqaB_">
+      <div class="PersonContent_personContent__leftColumn__pLwjh">
+        <div class="PersonContent_personContent__avatarWrapper__itxCt">
+          {{ partial "avatar.html" (dict "person" . "size" 322 "class" "PersonContent_personContent__avatar__MwIWd") }}
+        </div>
+      </div>
+      <div class="PersonContent_personContent__rightColumn__EUrbo">
+        <h1 class="PersonContent_personContent__title__txWO3">{{ .Title }}</h1>
+        {{- with .Params.company }}
+        <p class="PersonContent_personContent__company__8Sj_x"><span class="PersonContent_personContent__companyLabel__CGMi_">Компания: </span>{{ . }}</p>
+        {{- end }}
+        <div class="PersonContent_personContent__text__9exho">{{ .Content }}</div>
+        {{- with .Params.contacts }}
+        <ul class="PersonContent_personContent__contacts___2Kek PersonContacts_personContacts__xfl6U">
+          {{- range . }}
+          <li><a class="PersonContacts_personContacts__link__NjamR" href="{{ .url }}" aria-label="{{ index $contactLabels .type | default .type }}" rel="noreferrer noopener" target="_blank"><svg width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#{{ .type }}"></use></svg></a></li>
+          {{- end }}
+        </ul>
+        {{- end }}
+      </div>
+    </div>
+    <div class="">
+      {{- with $talks }}
+      <div class="PersonActivities_personActivities__current__8Asrz">
+        <h2 class="PersonActivitiesCurrent_personActivitiesCurrent__title__SmZ0O">Выступления в сезоне {{ $season }}</h2>
+        <ul class="TalksList_talksList__asFpU" data-detailed="false">
+          {{- range . }}<li class="TalksList_talksList__item__dlj6p">{{ partial "talk-card.html" . }}</li>{{ end }}
+        </ul>
+      </div>
+      {{- end }}
+      {{- with .Params.past_talks }}
+      <details class="PersonActivitiesPast_personActivitiesPast__QxfhY DetailsBlock_detailsBlock__E0Mr1 DetailsBlock_detailsBlock_filled__C5ddF">
+        <summary class="PersonActivitiesPast_personActivitiesPast__summary__y7ELI DetailsBlock_detailsBlock__summary__Stjl0">Прошедшие выступления</summary>
+        <div class="DetailsBlock_detailsBlock__content__oMPF6">
+          <ul class="PersonActivitiesList_personActivitiesList__zaqz2" data-detailed="false">
+            {{- range sort . "year" "desc" }}
+            <li>
+              <article class="TalkCard_talkCard__IAiMl" data-has-link="true">
+                <div class="TalkCard_talkCard__header__4k8Ga"></div>
+                <div class="TalkCard_talkCard__main__FzBQH">
+                  <div class="TalkCard_talkCard__properties__mszHE">{{ partial "talk-type.html" (dict "Params" (dict "format" .format)) }}<div class="TalkCard_talkCard__badges__xPdGv"><span class="TalkCard_talkCard__hall__zzZ3X TalkHall_talkHall__1ssxP">SnowOne {{ .year }}</span></div></div>
+                  <h3 class="TalkCard_talkCard__title__hMDtr"><a data-link="true" href="{{ .url }}">{{ .title }}</a></h3>
+                </div>
+                <div class="TalkCard_talkCard__footer__TOlqD"><ul class="TalkCard_talkCard__info__310V7 TalkInfo_talkInfo__gUUyn">{{ partial "talk-lang.html" (dict "Params" (dict "language" .language)) }}</ul></div>
+              </article>
+            </li>
+            {{- end }}
+          </ul>
+        </div>
+      </details>
+      {{- end }}
+    </div>
+  </div>
+</div>
+{{ end }}

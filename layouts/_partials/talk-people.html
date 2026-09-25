@@ -1,0 +1,6 @@
+{{- /* Возвращает персоны доклада: докладчики, затем ведущие. */ -}}
+{{- $people := slice -}}
+{{- range (.Params.speakers | default slice) | append (.Params.hosts | default slice) -}}
+  {{- with site.GetPage (printf "/persons/%s" .) }}{{ $people = $people | append . }}{{ end -}}
+{{- end -}}
+{{- return $people -}}

@@ -1,0 +1,12 @@
+{{ define "main" }}
+<div class="LegalContent_legalContent__LX6E6">
+  <div class="LegalContent_legalContent__container__8XyLz">
+    <h1 class="LegalContent_legalContent__title__3sKCz">{{ .Title }}</h1>
+    <ul class="LegalContent_legalContent__list__DODHJ">
+      {{- range (where site.RegularPages "Params.legal" true).ByWeight }}
+      <li class="LegalContent_legalContent__item__lwsx2"><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+      {{- end }}
+    </ul>
+  </div>
+</div>
+{{ end }}

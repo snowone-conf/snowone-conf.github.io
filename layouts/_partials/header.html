@@ -1,0 +1,45 @@
+{{- $conf := hugo.Data.conference -}}
+{{- define "partials/inline/main-links.html" -}}
+  {{- range site.Menus.main }}
+  <li class="HeaderMainLinks_headerMainLinks__item__TCQlw"><a class="HeaderMainLinks_headerMainLinks__link__0hKK7" href="{{ .URL }}"><span>{{ .Name }}</span></a></li>
+  {{- end }}
+{{- end -}}
+{{- define "partials/inline/important-links.html" -}}
+  {{- if site.Params.cfp.open }}
+  <li><a class="HeaderImportantLinks_headerImportantLinks__link_highlight__d0FH6 HeaderImportantLinks_headerImportantLinks__link__x8zW2" href="/callforpapers/"><svg width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#speaker"></use></svg><span>Стать спикером</span></a></li>
+  {{- end }}
+  {{- if and (ne site.Params.tickets.mode "off") site.Params.tickets.url }}
+  <li><a class="HeaderImportantLinks_headerImportantLinks__link__x8zW2" href="{{ site.Params.tickets.url }}" target="_blank" rel="noopener"><span>Купить билет</span></a></li>
+  {{- end }}
+{{- end -}}
+<header class="Layout_layout__header__182X3 Header_header___vw_L">
+  <div class="Header_header__container__w2lbV">
+    <a class="Header_header__skipLink__evyM4 SkipLink_skipLink__di3o8" href="#main__anchor" data-mode="dark">К основному контенту</a>
+    <nav class="Header_header__navigation__qqRuD HeaderNavigation_headerNavigation__HMLJA" aria-label="Основная" data-header-nav>
+      <button class="HeaderNavigation_headerNavigation__toggle__dQ9Wf MenuButton_menuButton__dbKGc" type="button" aria-label="Меню" aria-controls="headerNavigation__menu" aria-expanded="false" data-menu-toggle>
+        <svg class="MenuButton_menuButton__icon___ocEf" width="32" height="32" focusable="false" aria-hidden="true"><use class="MenuButton_menuButton__open__UB07Y" href="/img/sprite.svg#menu"></use><use class="MenuButton_menuButton__close__tXyKD" href="/img/sprite.svg#close"></use></svg>
+      </button>
+      <a class="HeaderNavigation_headerNavigation__home__DgYZg" href="/"><img class="HeaderNavigation_headerNavigation__logo__Ef4FX Logo_logo__nBPJy" src="/img/site/snowone-header-logo.svg" alt="{{ $conf.title }}" width="160" height="36"></a>
+      <div class="HeaderNavigation_headerNavigation__menu__AOeKj" id="headerNavigation__menu">
+        <div class="HeaderNavigation_headerNavigation__main__R0o3_">
+          <ul class="HeaderNavigation_headerNavigation__list__8_JtD HeaderMainLinks_headerMainLinks__hH9Zl" aria-label="Основные разделы" data-main-list>
+            {{ partial "inline/main-links.html" . }}
+          </ul>
+          <div class="HeaderNavigation_headerNavigation__more__bzVnk HeaderNavigation_headerNavigation__more_hidden__9wtfY HeaderExpandMenu_headerExpandMenu__Zj4CQ" aria-hidden="true" data-more>
+            <button class="HeaderNavigation_headerNavigation__moreButton__qfEHp HeaderExpandMenu_headerExpandMenu__toggle__kq5pU" type="button" aria-label="Еще" aria-controls="headerNavigation__more" aria-expanded="false" data-more-toggle><span>Еще</span><svg width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#arrow-down"></use></svg></button>
+            <ul class="HeaderExpandMenu_headerExpandMenu__list__gFAlR" id="headerNavigation__more" hidden data-more-list></ul>
+          </div>
+        </div>
+        <ul class="HeaderNavigation_headerNavigation__mobileImportant__CyRal HeaderImportantLinks_headerImportantLinks___y76s" aria-label="Важные разделы">
+          {{ partial "inline/important-links.html" . }}
+        </ul>
+      </div>
+      <ul class="HeaderNavigation_headerNavigation__desktopImportant__DbN_z HeaderImportantLinks_headerImportantLinks___y76s" aria-label="Важные разделы">
+        {{ partial "inline/important-links.html" . }}
+      </ul>
+      <ul class="HeaderNavigation_headerNavigation__hiddenList__WsLXK HeaderMainLinks_headerMainLinks__hH9Zl" aria-hidden="true" data-measure-list>
+        {{ partial "inline/main-links.html" . }}
+      </ul>
+    </nav>
+  </div>
+</header>

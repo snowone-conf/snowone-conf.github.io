@@ -1,0 +1,86 @@
+{{ define "main" }}
+{{- /* /analytics.js для замороженного архива */ -}}
+{{- $_ := (resources.Get "js/analytics.js" | resources.ExecuteAsTemplate "analytics.js" .).Publish -}}
+{{- $conf := hugo.Data.conference -}}
+<div class="HomeContentCurrent_homeContentCurrent__mYNWD">
+  <section class="HomeContentCurrent_homeContentCurrent__hero__mRE2d HomeHero_homeHero__lBqO_" data-mode="dark" data-over="{{ eq $conf.status "finished" }}" style="--bgImage:url(&quot;/img/site/hero-background-1.svg&quot;)">
+    <div class="HomeHero_homeHero__container__q_c6D">
+      <div class="HomeHero_homeHero__content__TMqfr">
+        <div class="HomeHero_homeHero__picture__w73B7">
+          <div class="HomeHero_homeHero__logoWrapper__JjgGt"><img class="HomeHero_homeHero__logo__oScx_ Logo_logo__nBPJy" src="/img/site/hero-art.svg" alt="{{ $conf.title }}" width="400" height="140"></div>
+        </div>
+        <div class="HomeHero_homeHero__about__1D3N7">
+          <h1 class="HomeHero_homeHero__title___E00U">{{ $conf.title }}</h1>
+          <p class="HomeHero_homeHero__description__ZIijW">{{ $conf.description }}</p>
+          {{- if eq $conf.status "finished" }}
+          <div class="HomeHero_homeHero__over__O6GJI HomeOver_homeOver__Xz1zh WarningBlock_warningBlock__H2OSi" data-important="true">
+            <svg class="WarningBlock_warningBlock__icon__WZFMp" width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#info"></use></svg>
+            <div class="WarningBlock_warningBlock__content__eDDNm"><p>Мероприятие завершилось</p></div>
+          </div>
+          {{- end }}
+          <div class="HomeHero_homeHero__info__QWgcd">
+            <div class="HomeHero_homeHero__dates__bKH48">
+              <p class="HomeHero_homeHero__block__B3g1l HeroLabel_heroLabel__jAQs3">
+                <span class="HeroLabel_heroLabel__date__YLXs6">{{ partial "date-range.html" (dict "start" $conf.start "end" $conf.end) }}</span>
+                <span class="HeroLabel_heroLabel__label__c_vd9">{{ $conf.venue.city }}</span>
+              </p>
+            </div>
+          </div>
+          <div class="HomeHero_homeHero__links__ap9hW">
+            {{- if and (ne $conf.status "finished") (eq site.Params.tickets.mode "link") site.Params.tickets.url }}
+            <a class="HomeHero_homeHero__link__1349P" href="{{ site.Params.tickets.url }}" target="_blank" rel="noopener">Купить билет</a>
+            {{- end }}
+            <a class="HomeHero_homeHero__link__1349P" href="/schedule/days/">Расписание</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="HomeContentCurrent_homeContentCurrent__info__4dqa6">
+    <ul class="HomeContentCurrent_homeContentCurrent__statistics__CmHvV HomeStatistics_homeStatistics__tuT3W">
+      {{- range $conf.statistics }}
+      <li class="HomeStatistics_homeStatistics__item__8zr8y HomeStatistics_homeStatistics__item_even__3xR_w"><span class="HomeStatistics_homeStatistics__value__sy_n3">{{ .value }}</span><span class="HomeStatistics_homeStatistics__label__0EpRZ">{{ .label }}</span></li>
+      {{- end }}
+    </ul>
+    <div class="">
+      <h2 class="HomeDescription_homeDescription__title__KeHka">О конференции</h2>
+      <div class="HomeDescription_homeDescription__text__A_9ze">{{ $conf.about | safeHTML }}</div>
+    </div>
+  </section>
+
+  {{- with site.Params.subscription.url }}
+  <section class="HomeContentCurrent_homeContentCurrent__subscription__vtVPy" id="subscription">
+    <div class="SubscriptionBanner_subscriptionBanner__container__FwnfI">
+      <div class="SubscriptionBanner_subscriptionBanner__banner__BbRjY" style="--bgImage:url(/img/site/snowone-subscription-bg-1.svg)">
+        <div class="SubscriptionBanner_subscriptionBanner__content__1_KjW">
+          <h2 class="SubscriptionBanner_subscriptionBanner__title__6vWW2">Подписаться на новости</h2>
+          <p class="SubscriptionBanner_subscriptionBanner__subtitle__Em_X7">SnowOne в Telegram</p>
+          <p class="SubscriptionBanner_subscriptionBanner__text__qrxzq">Новости SnowOne, обновления программы и скидки.</p>
+          <div class="SubscriptionBanner_subscriptionBanner__form__OO7M5">
+            <a class="SubscriptionBanner_subscriptionBanner__button__qcGvg" href="{{ . }}" target="_blank" rel="noopener">Подписаться</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {{- end }}
+
+  {{- with partial "season-speakers.html" . }}
+  <section class="HomeContentCurrent_homeContentCurrent__persons__VzwcT">
+    <div class="PersonsGroup_personsGroup__container__aHT_7">
+      <div class="PersonsGroup_personsGroup__header__KF2s8"><h2 class="PersonsGroup_personsGroup__title__qkQwL">Спикеры</h2></div>
+      <ul class="PersonList_personList__ydHvl">
+        {{- range . }}<li>{{ partial "person-card.html" . }}</li>{{ end }}
+      </ul>
+    </div>
+  </section>
+  {{- end }}
+
+  <section class="">
+    <div class="HomePartners_homePartners__list__N2rdr PartnersContent_partnersContent__LoPej">
+      {{ partial "partners-list.html" (dict "heading" "h2") }}
+    </div>
+  </section>
+</div>
+{{ end }}

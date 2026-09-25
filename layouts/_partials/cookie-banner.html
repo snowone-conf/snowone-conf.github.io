@@ -1,0 +1,7 @@
+{{- /* Баннер нужен, только если на сайте есть аналитика (cookies). */ -}}
+{{- if site.Params.yandexMetrikaId }}
+<div class="CookieBanner" data-cookie-banner hidden>
+  <p>Мы используем файлы cookies 🍪 — это улучшает работу сайта и делает его более эффективным. Продолжая использовать этот сайт, вы соглашаетесь с нашей <a href="/privacy_policy/">политикой обработки данных</a>.</p>
+  <button type="button">Принять</button>
+</div>
+{{- end }}

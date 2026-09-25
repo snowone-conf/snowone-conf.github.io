@@ -1,0 +1,4 @@
+{{- $labels := dict "general" "Генеральный партнер" "gold" "Золотой партнер" "silver" "Серебряный партнер" "regular" "Партнер" "info" "Информационный партнер" "venue" "Партнер площадки" -}}
+{{- $classes := dict "general" "PartnersType_partnersType_general__V_hOt" "gold" "PartnersType_partnersType_gold__R0WMt" "regular" "PartnersType_partnersType_regular__rqWql" -}}
+{{- $tier := .Params.tier | default "regular" -}}
+<span class="PartnersType_partnersType__NGKQL {{ index $classes $tier | default (index $classes "regular") }}">{{ index $labels $tier | default "Партнер" }}</span>

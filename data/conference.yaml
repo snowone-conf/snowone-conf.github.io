@@ -1,0 +1,57 @@
+season: 2026
+title: SnowOne 2026
+description: Content-First Java‑конференция из Сибири
+meta_description: Главное мероприятие года от Java-сообщества Сибири — 27-28 февраля 2026
+start: '2026-02-27T16:00:00+07:00'
+end: '2026-02-28T20:20:00+07:00'
+status: finished
+venue:
+  city: Новосибирск
+  title: Технопарк Новосибирского Академгородка
+  address: ул. Николаева, 12
+  map: https://yandex.ru/maps/-/CLFtzVn6
+organizer: JUGNsk
+since: 2020
+contacts:
+  support: support@snowone.ru
+  partners: partners@snowone.ru
+  telegram: https://t.me/jugnsk
+social:
+- name: youtube
+  url: https://www.youtube.com/@JUGNsk
+- name: twitter
+  url: https://x.com/snowone_conf
+- name: telegram
+  url: https://t.me/snowone_news
+statistics:
+- value: '3'
+  label: трека
+- value: '19'
+  label: докладов
+- value: '10'
+  label: партнеров
+- value: '300'
+  label: участников
+about: |
+  <p>У Java-сообщества Сибири есть традиция: раз в год собираемся офлайн в Новосибирске и говорим про Java и JVM — это то, что мы любим, практикуем, хотим и можем развивать.</p>
+  <p><strong>27 февраля</strong> на SnowOne 2026 студенческий день — студенты любых вузов участвуют бесплатно. Достаточно зарегистрироваться и показать студенческий на площадке конференции. Выступления этого дня не будут привязаны к Java — спикеры охватят широкий круг тем в IT: от верификации кода ОС до особенностей работы технических писателей. Простым языком расскажут, как устроена индустрия разработки.</p>
+  <p><strong>28 февраля</strong> — день для всех. Доклады — хардкорные, атмосфера — ламповая.</p>
+  <p>Организатор конференции — JUGNsk.</p>
+community_day:
+  title: Студенческий день
+  description: |
+    <p>27 февраля — бесплатный день конференции для студентов вузов</p>
+program_pdf: https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/snowone-ru.pdf
+days:
+- date: '2026-02-27'
+  tracks:
+  - number: 1
+    title: Большой конференц-зал
+- date: '2026-02-28'
+  tracks:
+  - number: 1
+    title: Большой конференц-зал
+  - number: 2
+    title: Конференц-зал №1
+  - number: 3
+    title: Конференц-зал №2

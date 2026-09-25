@@ -1,0 +1,10 @@
+{{- /* Аватар персоны. Параметры: dict "person" <Page> "size" <px> "class" <доп. класс> */ -}}
+{{- $p := .person -}}
+{{- $size := .size | default 62 -}}
+<div class="{{ .class }} Avatar_avatar__qbHjt Avatar_avatar_gradient__EGNg6">
+  {{- with and $p.Params.photo ($p.Resources.Get $p.Params.photo) }}
+    {{- $x1 := .Fill (printf "%dx%d Center q85" $size $size) -}}
+    {{- $x2 := .Fill (printf "%dx%d Center q85" (mul $size 2) (mul $size 2)) }}
+  <img class="Avatar_avatar__image__KVg2R" src="{{ $x1.RelPermalink }}" srcset="{{ $x2.RelPermalink }} 2x" alt="" width="{{ $size }}" height="{{ $size }}" loading="lazy">
+  {{- end }}
+</div>

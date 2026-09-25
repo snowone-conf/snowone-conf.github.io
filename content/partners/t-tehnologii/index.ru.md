@@ -1,0 +1,16 @@
+---
+title: Т-Технологии
+tier: gold
+weight: 20
+link: https://www.tbank.ru/career/
+logo: logo.svg
+buttons:
+- title: Мероприятия
+  url: https://meetup.tbank.ru
+- title: Хабр
+  url: https://habr.com/ru/companies/tbank/articles/
+- title: Telegram
+  url: https://t.me/+5vXsPKUs11I5OWIy
+season: 2026
+---
+<p>Команда группы Т-Технологии — это разработчики, тестировщики, SRE-инженеры, архитекторы, аналитики, продакт-менеджеры, дизайнеры и другие специалисты. Вместе они создают финтех-продукты, которыми пользуются более 46 миллионов клиентов. Группа Т-Технологии развивает IT-индустрию, поддерживает комьюнити и делится экспертизой.</p>
