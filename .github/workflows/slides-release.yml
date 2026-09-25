@@ -1,0 +1,42 @@
+# Загружает слайды докладов в GitHub Releases: один релиз на год (slides-<год>).
+# Список файлов — docs/slides.json (его генерирует tools/postprocess.py).
+# Уже загруженные файлы пропускаются, поэтому workflow можно запускать повторно.
+name: Slides to Releases
+
+on:
+  push:
+    paths: [docs/slides.json]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  upload:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Upload slides
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/slides
+          for year in $(jq -r '.[].year' docs/slides.json | sort -u); do
+            tag="slides-$year"
+            if ! gh release view "$tag" >/dev/null 2>&1; then
+              gh release create "$tag" --title "SnowOne $year — слайды" \
+                --notes "Слайды докладов SnowOne $year. Ссылки на файлы используются на сайте."
+            fi
+            existing=$(gh release view "$tag" --json assets --jq '.assets[].name')
+            jq -c --arg y "$year" '.[] | select(.year == $y)' docs/slides.json | while read -r s; do
+              name=$(jq -r .name <<<"$s"); src=$(jq -r .source <<<"$s")
+              if grep -qxF "$name" <<<"$existing"; then echo "skip $tag/$name"; continue; fi
+              curl -fsSL --retry 3 -o "/tmp/slides/$name" "$src"
+              gh release upload "$tag" "/tmp/slides/$name"
+              rm "/tmp/slides/$name"
+              echo "uploaded $tag/$name"
+            done
+          done

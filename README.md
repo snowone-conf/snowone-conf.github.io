@@ -9,9 +9,13 @@
 |---|---|
 | `snapshot/` | копия сайта, публикуется в GitHub Pages как есть |
 | `tools/mirror.py` | скрипт, который снимает копию (только стандартная библиотека Python; Pillow — по желанию, для сжатия фото) |
+| `tools/postprocess.py` | отвязка копии от JUG Ru: убирает их аналитику и ссылки, переносит слайды в релизы. Запускается из `mirror.py` автоматически |
+| `overrides/` | файлы, которые кладутся в корень сайта: `analytics.js` (своя аналитика), `overrides.css` (правки стилей) |
+| `docs/slides.json` | слайды докладов: исходный URL → релиз `slides-<год>` |
 | `docs/audit.md` | что на сайте зависело от старой системы и что с этим делать |
 | `docs/snapshot-manifest.json` | список страниц, редиректов и ошибок последнего снятия |
-| `.github/workflows/pages.yml` | деплой `snapshot/` в GitHub Pages при пуше в `main` |
+| `.github/workflows/pages.yml` | деплой `snapshot/` в GitHub Pages при пуше в ветку по умолчанию |
+| `.github/workflows/slides-release.yml` | загрузка слайдов из `docs/slides.json` в GitHub Releases |
 
 ## Посмотреть локально
 ```sh
@@ -25,9 +29,15 @@ pip install pillow        # по желанию: без него фото не �
 rm -rf snapshot && python3 tools/mirror.py snapshot
 ```
 
+## Своя аналитика
+Раскомментируйте шаблон в `overrides/analytics.js` (или вставьте свой код) и выполните `python3 tools/postprocess.py`: он скопирует файл в `snapshot/`.
+
+## Слайды
+Слайды лежат в GitHub Releases, по релизу на год: `slides-2025`, `slides-2026`. Список файлов — `docs/slides.json`. Когда он меняется в ветке по умолчанию, workflow `Slides to Releases` скачивает недостающие файлы и загружает их в релизы. Его можно запустить и вручную (Actions → Slides to Releases → Run workflow).
+
 ## Публикация в GitHub Pages
 1. Settings → Pages → Build and deployment → Source: **GitHub Actions**.
-2. Смержить в `main` — workflow `Deploy to GitHub Pages` опубликует `snapshot/`.
+2. Пуш в ветку по умолчанию — workflow `Deploy to GitHub Pages` опубликует `snapshot/`. Если нужно опубликовать без изменений, запустите его вручную.
 
 Снапшот использует корневые пути (`/_next/…`), поэтому работает **только из корня домена**:
 - `https://<org>.github.io/` — для этого репозиторий должен называться `<org>.github.io`;

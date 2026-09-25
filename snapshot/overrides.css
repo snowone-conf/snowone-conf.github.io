@@ -1,0 +1,4 @@
+/* Косметические правки поверх стилей платформы. Подключается на каждой странице. */
+
+/* Баннер личного кабинета спикера JUG Ru (speakers.jugru.org) на /callforpapers/ */
+[class*="CallforpapersCabinetBanner_"] { display: none !important; }

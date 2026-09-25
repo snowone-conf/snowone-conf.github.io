@@ -1,0 +1,92 @@
+[
+ {
+  "year": "2025",
+  "name": "snowone-2025.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/65d4b60f-8032-4115-9616-b355a5bf6846/snowone-2025.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2025/snowone-2025.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "10-15-nikolai-rudopas.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/ffe7b0ba-1cfa-42c6-bb0c-e37af9c7ddb6/10-15-nikolai-rudopas.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/10-15-nikolai-rudopas.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "11-40-aleksandr-lancov.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/85004ec4-3c16-436e-9399-46c5adcff3a0/11-40-aleksandr-lancov.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/11-40-aleksandr-lancov.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "14-00-daniil-stepanov.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/bcb925da-1a3b-49d6-ba1f-357bda95ec6c/14-00-daniil-stepanov.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/14-00-daniil-stepanov.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "15-25-sergei-petrelevich.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/73ba6213-bf58-44b6-b5d5-e3b0e3502ce9/15-25-sergei-petrelevich.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/15-25-sergei-petrelevich.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "16-15-ilsya-gavrilin.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/be101c0f-eced-4a52-8271-7b7b0ec03f2d/16-15-ilsya-gavrilin.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/16-15-ilsya-gavrilin.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "16-50-ivan-uglyanskii-.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/8b60fc07-2e66-4ae5-85e9-1e7efb552dbc/16-50-ivan-uglyanskii-.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/16-50-ivan-uglyanskii-.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "17-15-vladislav-ahmedov.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/5173867f-6429-47d0-84aa-9b3a43136ddc/17-15-vladislav-ahmedov.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/17-15-vladislav-ahmedov.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "18-30-egor-ershov.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/2eb7954b-2781-49fe-8870-0bca8d5de623/18-30-egor-ershov.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/18-30-egor-ershov.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "19-30-ivan-timofeev.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/0f733948-9671-4e56-ae3e-2dfc234c1049/19-30-ivan-timofeev.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/19-30-ivan-timofeev.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "28.02-aleksandr-tokarev.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/347d7488-ef3c-4f42-816f-c056c2e97098/28.02-aleksandr-tokarev.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/28.02-aleksandr-tokarev.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "28.02-vyacheslav-tihonov.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/85678b8d-5d23-4dfd-ab0f-3f29c4b8160c/28.02-vyacheslav-tihonov.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/28.02-vyacheslav-tihonov.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "dsl-with-mps-v2.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/305dfa31-eaac-4477-916c-217a136bcf0e/dsl-with-mps-v2.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/dsl-with-mps-v2.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "snowone-p.-portnov.pdf",
+  "source": "https://squidex.jugru.team/api/assets/srm/9beed7bb-4d58-4444-9886-2149bccb440c/snowone-p.-portnov.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/snowone-p.-portnov.pdf"
+ },
+ {
+  "year": "2026",
+  "name": "snowone-ru.pdf",
+  "source": "https://cdn.jugru.org/m2m/public/sites/program/SNOWONE/150034/snowone-ru.pdf",
+  "url": "https://github.com/snowone-conf/snowone-conf.github.io/releases/download/slides-2026/snowone-ru.pdf"
+ }
+]

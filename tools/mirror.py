@@ -374,6 +374,9 @@ def main():
     patch_js()
     optimize_images()
     write_redirects()
+    import postprocess  # отвязка от инфраструктуры JUG Ru, см. tools/postprocess.py
+    postprocess.OUT = OUT
+    postprocess.main()
     manifest = {
         "origin": ORIGIN,
         "fetched_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
