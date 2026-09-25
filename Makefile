@@ -18,10 +18,10 @@ test:             ## тесты служебных скриптов
 import-cfp:       ## черновики докладов из выгрузки Яндекс Форм: make import-cfp FILE=export.xlsx [ARGS="--only 12,15"]
 	python3 tools/import_cfp.py "$(FILE)" $(ARGS)
 
-import:           ## (разово) перенести данные сезона из snapshot/ в content/ и data/ (не перезаписывает)
+import:           ## (разово, нужна папка snapshot/) перенести данные сезона из snapshot/ в content/ и data/ (не перезаписывает)
 	python3 tools/import_nextdata.py
 
-archive:          ## обновить замороженный архив в static/ из snapshot/
+archive:          ## (нужна папка snapshot/) обновить замороженный архив в static/
 	python3 tools/freeze_archive.py
 
 snapshot:         ## заново снять копию старого сайта (нужен доступ к snowone.ru)

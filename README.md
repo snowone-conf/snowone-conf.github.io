@@ -83,7 +83,6 @@ make import-cfp FILE=export.xlsx ARGS="--only 12,15"      # только при�
 
 | Путь | Что это |
 |---|---|
-| `snapshot/` | полная копия старого сайта (источник для переноса и архива) |
 | `tools/mirror.py`, `tools/postprocess.py` | снятие копии и отвязка от инфраструктуры JUG Ru |
 | `tools/import_nextdata.py` | разовый перенос данных сезона 2026 из копии в `content/` и `data/` |
 | `tools/freeze_archive.py` | копирует архив из `snapshot/` в `static/` |
@@ -92,7 +91,7 @@ make import-cfp FILE=export.xlsx ARGS="--only 12,15"      # только при�
 | `docs/audit.md` | что зависело от старой системы и что с этим сделано |
 | `docs/slides.json`, workflow `Slides to Releases` | перенос слайдов в GitHub Releases |
 
-Когда `snapshot/` станет не нужен, его можно удалить: для сборки сайта он не используется.
+Полная копия старого сайта (`snapshot/`) из `main` удалена: для сборки она не нужна. Она сохранена в ветке [`source-snapshot`](../../tree/source-snapshot). Скрипты переноса читают её из папки `snapshot/`: чтобы запустить их снова, достаньте копию из ветки (`git archive origin/source-snapshot snapshot | tar -x` — так файлы не попадут в индекс) или снимите заново (`make snapshot`).
 
 ## Публикация
 
