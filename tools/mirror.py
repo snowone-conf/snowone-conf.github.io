@@ -243,7 +243,7 @@ SQUIDEX_EXTERNAL = (".pdf", ".pptx", ".zip", ".mp4")
 def get_squidex(key):
     local = squidex_local(key)
     if key.lower().endswith(SQUIDEX_EXTERNAL):
-        return  # слайды оставляем ссылками на CDN (см. docs/audit.md)
+        return  # слайды не скачиваем: они переносятся в GitHub Releases (postprocess.py)
     status, headers, body, _ = fetch(SQUIDEX + key + "?cache=3600", follow=True)
     if status != 200:
         failures.append(("squidex:" + key, status))

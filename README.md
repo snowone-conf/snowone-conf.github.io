@@ -88,7 +88,6 @@ make import-cfp FILE=export.xlsx ARGS="--only 12,15"      # только при�
 | `tools/freeze_archive.py` | копирует архив из `snapshot/` в `static/` |
 | `tools/check_refs.py` | проверка целостности контента (запускается в CI) |
 | `tools/import_cfp.py`, `tools/cfp_mapping.yaml` | импорт заявок CFP из Яндекс Форм |
-| `docs/audit.md` | что зависело от старой системы и что с этим сделано |
 | `docs/slides.json`, workflow `Slides to Releases` | перенос слайдов в GitHub Releases |
 
 Полная копия старого сайта (`snapshot/`) из `main` удалена: для сборки она не нужна. Она сохранена в ветке [`source-snapshot`](../../tree/source-snapshot). Скрипты переноса читают её из папки `snapshot/`: чтобы запустить их снова, достаньте копию из ветки (`git archive origin/source-snapshot snapshot | tar -x` — так файлы не попадут в индекс) или снимите заново (`make snapshot`).
