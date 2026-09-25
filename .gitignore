@@ -1,6 +1,7 @@
 # Выгрузки ответов Яндекс Форм — персональные данные, не коммитим
 *.xlsx
 *.csv
+!tools/tests/*.csv
 # Hugo
 /public/
 /resources/_gen/

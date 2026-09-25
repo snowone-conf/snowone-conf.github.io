@@ -27,6 +27,8 @@ make serve          # или: hugo server -D
 | `make serve` | локальный сервер с live-reload (черновики `draft: true` тоже видны) |
 | `make build` | сборка сайта в `public/` |
 | `make check` | проверка ссылок между докладами и персонами и строгая сборка (как в CI) |
+| `make import-cfp FILE=…` | черновики докладов из выгрузки Яндекс Форм |
+| `make test` | тесты служебных скриптов |
 
 ## Где что лежит
 
@@ -58,6 +60,13 @@ hugo new talks/my-talk/index.ru.md
 ```
 В поле `speakers` перечислите имена папок докладчиков (`ivan-ivanov`). Время указывается новосибирское, с `+07:00`. `day` и `track` — номера дня и зала из `data/conference.yaml`. Пока стоит `draft: true`, доклад виден только в `make serve`.
 
+**Перенести заявки из CFP (Яндекс Формы):** выгрузите ответы формы в `.xlsx` или `.csv` и выполните
+```sh
+make import-cfp FILE=~/Downloads/export.xlsx              # все ответы
+make import-cfp FILE=export.xlsx ARGS="--only 12,15"      # только принятые (номера ответов)
+```
+Скрипт создаст черновики (`draft: true`) докладов и докладчиков и скачает фото по ссылкам из формы. Уже существующие файлы он не трогает. E-mail, телефоны и комментарии для ПК в контент не попадают. Если вопросы в форме называются иначе, поправьте `tools/cfp_mapping.yaml`. Саму выгрузку в репозиторий не коммитьте: `*.xlsx` и `*.csv` в `.gitignore`. Для `.xlsx` нужен `pip install openpyxl`.
+
 **Добавить партнёра:** создайте `content/partners/<slug>/index.ru.md` по образцу существующих и положите рядом `logo.svg`. `tier` — `general` | `gold` | `regular`.
 
 **Слайды:** PDF хранятся в GitHub Releases, по релизу на год (`slides-2026`, …). Загрузите файл в релиз и укажите ссылку в поле `slides` доклада.
@@ -79,6 +88,7 @@ hugo new talks/my-talk/index.ru.md
 | `tools/import_nextdata.py` | разовый перенос данных сезона 2026 из копии в `content/` и `data/` |
 | `tools/freeze_archive.py` | копирует архив из `snapshot/` в `static/` |
 | `tools/check_refs.py` | проверка целостности контента (запускается в CI) |
+| `tools/import_cfp.py`, `tools/cfp_mapping.yaml` | импорт заявок CFP из Яндекс Форм |
 | `docs/audit.md` | что зависело от старой системы и что с этим сделано |
 | `docs/slides.json`, workflow `Slides to Releases` | перенос слайдов в GitHub Releases |
 

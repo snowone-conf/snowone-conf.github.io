@@ -61,7 +61,7 @@ def main():
                 for pid in fm.get(role) or []:
                     if pid not in persons:
                         errors.append(f"{rel(f)}: {role} ссылается на несуществующую персону {pid}")
-            if fm.get("season") != conf.get("season") or not f.endswith(".ru.md"):
+            if fm.get("draft") or fm.get("season") != conf.get("season") or not f.endswith(".ru.md"):
                 continue
             missing = [k for k in ("day", "start", "end", "track") if not fm.get(k)]
             if missing:

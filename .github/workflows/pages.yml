@@ -30,8 +30,9 @@ jobs:
           hugo version
       - name: Check content
         run: |
-          pip install --quiet pyyaml
+          pip install --quiet pyyaml openpyxl
           python3 tools/check_refs.py
+          python3 -m unittest discover -s tools/tests
       - id: pages
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
