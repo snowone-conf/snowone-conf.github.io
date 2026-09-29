@@ -35,6 +35,9 @@ params:
   cfp:
     open: true
     url: "mailto:support@snowone.ru?subject=SnowOne%20CFP"  # позже — ссылка на Яндекс Форму
+  # Подписка на новости: кнопка ведёт в Telegram-канал. Пусто — баннера нет.
+  subscription:
+    url: https://t.me/snowone_news
   # Своя аналитика: номер счётчика Яндекс Метрики. Пусто — аналитики нет.
   yandexMetrikaId: ""
 
