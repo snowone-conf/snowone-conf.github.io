@@ -1,0 +1,20 @@
+{{ define "main" }}
+<div class="ArchiveContent_archiveContent__J5euv">
+  <div class="ArchiveContent_archiveContent__container__HPSR8">
+    <h1 class="ArchiveContent_archiveContent__title__Ha0oo">{{ .Title }}</h1>
+    <ul class="ArchiveContent_archiveContent__list__S5nQ9">
+      {{- range hugo.Data.archive }}
+      <li>
+        <article class="ArchiveContent_archiveContent__listCard__xRq9p ArchiveCard_archiveCard__9mlif" data-has-link="true">
+          <div class="ArchiveCard_archiveCard__picture__GfP1r"><img class="ArchiveCard_archiveCard__image__vzIYN" src="{{ .image }}" alt="" width="512" height="230" loading="lazy"></div>
+          <div class="ArchiveCard_archiveCard__info__q7OAe">
+            <h2 class="ArchiveCard_archiveCard__title__ENsQZ"><a data-link="true" href="{{ .url }}">{{ .title }}</a></h2>
+            <div class="ArchiveCard_archiveCard__dates__tJ9DA"><p class="ArchiveCard_archiveCard__format__Tj0X2">{{ partial "date-range.html" (dict "start" .start "end" .end) }}<span> · </span>{{ .city }}</p></div>
+          </div>
+        </article>
+      </li>
+      {{- end }}
+    </ul>
+  </div>
+</div>
+{{ end }}

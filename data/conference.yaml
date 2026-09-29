@@ -15,12 +15,13 @@ since: 2020
 contacts:
   support: support@snowone.ru
   partners: partners@snowone.ru
-  telegram: https://t.me/jugnsk
+  telegram: https://t.me/snowone_chat
 social:
 - name: youtube
   url: https://www.youtube.com/@JUGNsk
-- name: twitter
-  url: https://x.com/snowone_conf
+# Икс (Twitter) в подвале пока скрыт:
+# - name: twitter
+#   url: https://x.com/snowone_conf
 - name: telegram
   url: https://t.me/snowone_news
 statistics:

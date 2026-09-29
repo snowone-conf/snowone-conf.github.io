@@ -1,6 +1,6 @@
 # Локальная работа с сайтом. Нужны: Hugo extended (версия в .hugo-version), Python 3 + PyYAML.
 
-.PHONY: serve build check test import-cfp clean
+.PHONY: serve build check test import-cfp freeze-season clean
 
 serve:            ## локальный сервер с live-reload: http://localhost:1313
 	hugo server -D --disableFastRender
@@ -17,6 +17,9 @@ test:             ## тесты служебных скриптов
 
 import-cfp:       ## черновики докладов из выгрузки Яндекс Форм: make import-cfp FILE=export.xlsx [ARGS="--only 12,15"]
 	python3 tools/import_cfp.py "$(FILE)" $(ARGS)
+
+freeze-season:    ## заморозить текущий сезон в static/archive/<год>/: make freeze-season [ARGS="2026 --force"]
+	python3 tools/freeze_season.py $(ARGS)
 
 clean:
 	rm -rf public resources/_gen

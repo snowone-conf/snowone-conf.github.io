@@ -35,9 +35,6 @@ params:
   cfp:
     open: true
     url: "mailto:support@snowone.ru?subject=SnowOne%20CFP"  # позже — ссылка на Яндекс Форму
-  # Подписка на новости (форма JUG Ru не работает — ведём в Telegram-канал)
-  subscription:
-    url: https://t.me/snowone_news
   # Своя аналитика: номер счётчика Яндекс Метрики. Пусто — аналитики нет.
   yandexMetrikaId: ""
 
@@ -49,5 +46,5 @@ menus:
     - {name: О нас, url: /organizers/, weight: 40}
     - {name: Архив, url: /archive/, weight: 50}
     - {name: Code of Conduct, url: /coc/, weight: 60}
-    - {name: Правила участия, url: /rules/, weight: 70}
-    - {name: Правовые документы, url: /legal/, weight: 80}
+    # Правила участия пока скрыты (draft: true в content/rules/) — вернуть вместе со страницей:
+    # - {name: Правила участия, url: /rules/, weight: 70}
