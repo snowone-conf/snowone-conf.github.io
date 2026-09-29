@@ -12,7 +12,9 @@
   * общие статические файлы из static/ (шрифты, спрайт, /_next/, /squidex/ и т.п.),
     кроме картинок сезона /img/site/…: они копируются, чтобы архив не поменялся
     вместе с оформлением нового сезона;
-  * сам архив (/archive/…) — ссылки на него остаются как есть;
+  * архивы сезонов (/archive/<год>/…) — ссылки на них остаются как есть.
+    Список сезонов /archive/ замораживается вместе с сезоном в
+    /archive/<год>/archive/ (как в архиве 2025), и меню архивной копии ведёт туда;
   * 404.html, robots.txt, sitemap.xml.
 
 Аналитика: встроенный счётчик убирается, вместо него подключается общий
@@ -53,9 +55,13 @@ def url_pattern(sections):
         % (re.escape(BASE_URL), names))
 
 
+RE_ARCHIVE_INDEX = re.compile(r"(?P<pre>[\s\"'(=,;])(?P<base>%s)?/archive/(?=[\"'#?&])" % re.escape(BASE_URL))
+
+
 def rewrite(html, sections, prefix):
-    """Переписывает ссылки на разделы sections и на главную под префикс архива."""
+    """Переписывает ссылки на разделы sections, главную и список архива под префикс архива."""
     html = url_pattern(sections).sub(lambda m: "%s%s%s/" % (m["pre"], m["base"] or "", prefix), html)
+    html = RE_ARCHIVE_INDEX.sub(lambda m: "%s%s%s/archive/" % (m["pre"], m["base"] or "", prefix), html)
     html = RE_METRIKA.sub("", html)
     if ANALYTICS_TAG not in html and 'http-equiv="refresh"' not in html:
         html = html.replace("</head>", "%s\n</head>" % ANALYTICS_TAG, 1)
@@ -92,6 +98,8 @@ def main():
         for e in entries:
             src = os.path.join(build, e)
             (shutil.copytree if os.path.isdir(src) else shutil.copy)(src, os.path.join(dest, e))
+        os.makedirs(os.path.join(dest, "archive"))
+        shutil.copy(os.path.join(build, "archive", "index.html"), os.path.join(dest, "archive", "index.html"))
 
     sections = [e for e in entries if os.path.isdir(os.path.join(dest, e))] + [SEASON_IMAGES]
     pages = images = 0

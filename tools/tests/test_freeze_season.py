@@ -33,6 +33,13 @@ class RewriteTest(unittest.TestCase):
         self.assertIn('url(&quot;/archive/2026/img/site/bg.svg&quot;)', html)
         self.assertIn('url=/archive/2026/talks/"', rewrite('<meta http-equiv="refresh" content="0; url=/talks/">'))
 
+    def test_archive_index(self):
+        html = rewrite('<a href="/archive/">А</a><a href="/archive/2025/">2025</a>'
+                       '<link rel="canonical" href="https://snowone.ru/archive/">')
+        self.assertIn('<a href="/archive/2026/archive/">', html)
+        self.assertIn('<a href="/archive/2025/">', html)
+        self.assertIn('href="https://snowone.ru/archive/2026/archive/"', html)
+
     def test_untouched(self):
         html = ('<a href="/archive/2025/talks/x/"></a><use href="/img/sprite.svg#info"></use>'
                 '<a href="/speakersclub/"></a><a href="/fonts/a.woff2"></a><br /> 1 / 2')

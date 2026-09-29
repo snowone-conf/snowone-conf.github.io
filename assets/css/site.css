@@ -13,3 +13,9 @@
   font: 500 16px Roboto, sans-serif; cursor: pointer;
 }
 .CookieBanner button:hover { background: #28588a; }
+
+/* Подписка ведёт в Telegram: ссылка вместо кнопки формы */
+a.SubscriptionBanner_subscriptionBanner__button__qcGvg {
+  display: flex; align-items: center; justify-content: center; text-decoration: none;
+}
+.SubscriptionBanner_subscriptionBanner__form__OO7M5 { margin-top: 24px; }
