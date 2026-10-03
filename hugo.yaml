@@ -31,6 +31,9 @@ params:
     mode: off
     url: ""            # страница события на Timepad
     timepadEventId: "" # для mode: widget
+  # Регистрация на мероприятие: кнопка на главной. Пока — общий сайт Timepad, позже — страница события.
+  registration:
+    url: https://timepad.ru/
   # Приём докладов (CFP)
   cfp:
     open: true
@@ -43,7 +46,6 @@ params:
 
 menus:
   main:
-    - {name: Расписание, url: /schedule/days/, weight: 10}
     - {name: Спикеры, url: /speakers/, weight: 20}
     - {name: Партнеры, url: /partners/, weight: 30}
     - {name: О нас, url: /organizers/, weight: 40}

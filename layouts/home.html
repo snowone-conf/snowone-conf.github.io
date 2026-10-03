@@ -12,25 +12,21 @@
         <div class="HomeHero_homeHero__about__1D3N7">
           <h1 class="HomeHero_homeHero__title___E00U">{{ $conf.title }}</h1>
           <p class="HomeHero_homeHero__description__ZIijW">{{ $conf.description }}</p>
-          {{- if eq $conf.status "finished" }}
-          <div class="HomeHero_homeHero__over__O6GJI HomeOver_homeOver__Xz1zh WarningBlock_warningBlock__H2OSi" data-important="true">
-            <svg class="WarningBlock_warningBlock__icon__WZFMp" width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#info"></use></svg>
-            <div class="WarningBlock_warningBlock__content__eDDNm"><p>Мероприятие завершилось</p></div>
-          </div>
-          {{- end }}
           <div class="HomeHero_homeHero__info__QWgcd">
             <div class="HomeHero_homeHero__dates__bKH48">
               <p class="HomeHero_homeHero__block__B3g1l HeroLabel_heroLabel__jAQs3">
-                <span class="HeroLabel_heroLabel__date__YLXs6">{{ partial "date-range.html" (dict "start" $conf.start "end" $conf.end) }}</span>
-                <span class="HeroLabel_heroLabel__label__c_vd9">{{ $conf.venue.city }}</span>
+                <span class="HeroLabel_heroLabel__date__YLXs6">{{ partial "date-range.html" (dict "start" $conf.start "end" $conf.end "year" true) }}</span>
+                <span class="HeroBadges">
+                  <span class="HeroLabel_heroLabel__label__c_vd9">{{ $conf.venue.city }}</span>
+                  <span class="HeroLabel_heroLabel__label__c_vd9">Оффлайн</span>
+                </span>
               </p>
             </div>
           </div>
           <div class="HomeHero_homeHero__links__ap9hW">
-            {{- if and (ne $conf.status "finished") (eq site.Params.tickets.mode "link") site.Params.tickets.url }}
-            <a class="HomeHero_homeHero__link__1349P" href="{{ site.Params.tickets.url }}" target="_blank" rel="noopener">Купить билет</a>
+            {{- with site.Params.registration.url }}
+            <a class="HomeHero_homeHero__link__1349P" href="{{ . }}" target="_blank" rel="noopener">Регистрация</a>
             {{- end }}
-            <a class="HomeHero_homeHero__link__1349P" href="/schedule/days/">Расписание</a>
           </div>
         </div>
       </div>
@@ -66,16 +62,18 @@
   </section>
   {{- end }}
 
-  {{- with partial "season-speakers.html" . }}
   <section class="HomeContentCurrent_homeContentCurrent__persons__VzwcT">
     <div class="PersonsGroup_personsGroup__container__aHT_7">
       <div class="PersonsGroup_personsGroup__header__KF2s8"><h2 class="PersonsGroup_personsGroup__title__qkQwL">Спикеры</h2></div>
+      {{- with partial "season-speakers.html" . }}
       <ul class="PersonList_personList__ydHvl">
         {{- range . }}<li>{{ partial "person-card.html" . }}</li>{{ end }}
       </ul>
+      {{- else }}
+      {{ partial "placeholder.html" "Скоро здесь появятся первые спикеры SnowOne" }}
+      {{- end }}
     </div>
   </section>
-  {{- end }}
 
   <section class="">
     <div class="HomePartners_homePartners__list__N2rdr PartnersContent_partnersContent__LoPej">

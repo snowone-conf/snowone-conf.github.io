@@ -2,11 +2,11 @@
 {{- $partners := where (where site.RegularPages "Section" "partners") "Params.season" hugo.Data.conference.season -}}
 {{- $h := .heading | default "h2" -}}
 {{- $cardH := cond (eq $h "h1") "h2" "h3" -}}
-{{- with $partners.ByWeight }}
 <div class="PartnersContent_partnersContent__container__PSJXM">
   <div class="PartnersContent_partnersContent__header__BlMWR">
     {{ printf "<%s class=\"PartnersContent_partnersContent__title__S_O4y\">Партнеры</%s>" $h $h | safeHTML }}
   </div>
+{{- with $partners.ByWeight }}
   <ul class="PartnersContent_partnersContent__mainList__irGr_ PartnersList_partnersList__OGiNF" data-detailed="true">
     {{- range . }}
     <li class="PartnersList_partnersList__item__iTdTo">
@@ -30,5 +30,7 @@
     </li>
     {{- end }}
   </ul>
-</div>
+{{- else }}
+  {{ partial "placeholder.html" "Скоро здесь появятся первые партнёры SnowOne" }}
 {{- end }}
+</div>
