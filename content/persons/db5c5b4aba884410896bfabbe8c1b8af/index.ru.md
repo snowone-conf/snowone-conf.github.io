@@ -4,6 +4,11 @@ weight: 20
 company: Мир Plat.Form
 photo: photo.jpg
 past_talks:
+- year: 2026
+  title: Сборка мусора в Java и Go
+  format: talk
+  language: en
+  url: /archive/2026/talks/ddff3af4076e4c819b3b48f78519d5ef/
 - year: 2025
   title: Эволюция моделей памяти
   format: talk
