@@ -1,14 +1,37 @@
 ---
 title: Иван Углянский
 weight: 60
-company: Huawei
-position: Эксперт
 photo: photo.jpg
 contacts:
 - type: github
   url: https://github.com/ugliansky
 committee: true
 past_talks:
+- year: 2026
+  title: Открытие конференции SnowOne
+  format: conversation
+  language: ru
+  url: /archive/2026/talks/f607229b456b414d899612b82fcc3618/
+- year: 2026
+  title: Закрытие первого дня конференции
+  format: conversation
+  language: ru
+  url: /archive/2026/talks/95da6d94f2b241b0945d6e37dc0daa4d/
+- year: 2026
+  title: Открытие второго дня конференции
+  format: conversation
+  language: ru
+  url: /archive/2026/talks/84ad8a7b311e4d33a998b66a6fe7417c/
+- year: 2026
+  title: Проект Valhalla, или Как добавить value-типы в Java, не превращая ее в C++
+  format: talk
+  language: ru
+  url: /archive/2026/talks/f81c3a58044b46038eaa5028ef79c7a0/
+- year: 2026
+  title: Закрытие конференции SnowOne
+  format: conversation
+  language: ru
+  url: /archive/2026/talks/0db0ae58339f468394ed7d890d559b85/
 - year: 2025
   title: Открытие SnowOne
   format: talk

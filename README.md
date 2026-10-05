@@ -1,6 +1,6 @@
 # snowone.ru
 
-Сайт конференции [SnowOne](https://snowone.ru/) — Content-First Java-конференции из Сибири (JUGNsk).
+Сайт конференции [SnowOne](https://snowone.ru/) — Content-First конференции из Сибири (JUGNsk).
 
 Сайт статический и собирается [Hugo](https://gohugo.io/) из Markdown/YAML-файлов этого репозитория. Он публикуется в GitHub Pages на каждый пуш в `main`. Внешний вид повторяет прежний сайт, который работал на прежней системе: в шаблонах используются её стили.
 

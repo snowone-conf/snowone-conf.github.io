@@ -5,6 +5,16 @@ company: Ozon
 position: Ведущий разработчик
 photo: photo.png
 past_talks:
+- year: 2026
+  title: Ловим баги с Error Prone [18+]
+  format: talk
+  language: ru
+  url: /archive/2026/talks/509a9ae7cc1e43738dfce080df5a19db/
+- year: 2026
+  title: Lightning Talks
+  format: conversation
+  language: ru
+  url: /archive/2026/talks/f8c9d000342640c788b72468b8522a8f/
 - year: 2025
   title: Банальные свичи
   format: talk

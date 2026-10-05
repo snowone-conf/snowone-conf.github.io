@@ -2,9 +2,13 @@
 <div class="PersonsContent_personsContent__VwRb9">
   <div class="PersonsContent_personsContent__container__apg9u">
     <h1 class="PersonsContent_personsContent__title__B8Zko">{{ .Title }}</h1>
+    {{- with partial "season-speakers.html" . }}
     <ul class="PersonList_personList__ydHvl">
-      {{- range partial "season-speakers.html" . }}<li>{{ partial "person-card.html" . }}</li>{{ end }}
+      {{- range . }}<li>{{ partial "person-card.html" . }}</li>{{ end }}
     </ul>
+    {{- else }}
+    {{ partial "placeholder.html" "Скоро здесь появятся первые спикеры SnowOne" }}
+    {{- end }}
   </div>
 </div>
 {{ end }}

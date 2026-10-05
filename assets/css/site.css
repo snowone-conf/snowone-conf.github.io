@@ -19,3 +19,13 @@ a.SubscriptionBanner_subscriptionBanner__button__qcGvg {
   display: flex; align-items: center; justify-content: center; text-decoration: none;
 }
 .SubscriptionBanner_subscriptionBanner__form__OO7M5 { margin-top: 24px; }
+
+/* Ярлыки в шапке главной (город, формат) стоят в ряд */
+.HeroBadges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+/* Заглушка раздела без данных («Скоро здесь появятся…») */
+.SitePlaceholder {
+  margin: 0; padding: 48px 24px; text-align: center;
+  font-size: 20px; line-height: 1.4; color: #8a8f98;
+  border: 2px dashed currentColor; border-radius: 16px; opacity: .8;
+}
