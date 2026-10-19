@@ -1,0 +1,23 @@
+[95mRunning Hugo 0.166.0 via hugo-python-distributions at /usr/local/lib/python3.11/dist-packages/hugo/binaries/hugo[0m
+Watching for changes in /home/user/snowone-conf/archetypes, /home/user/snowone-conf/assets/{css,js}, /home/user/snowone-conf/content/{archive,callforpapers,coc,organizers,partners,...}, /home/user/snowone-conf/data, /home/user/snowone-conf/i18n, /home/user/snowone-conf/layouts/{_partials,partners,persons,talks}, /home/user/snowone-conf/static/{_next,archive,fonts,img,squidex}
+Watching for config changes in /home/user/snowone-conf/hugo.yaml
+Start building sites … 
+hugo v0.166.0-78400b4de8adc99273d3e674ed6c4d14c3bdf669+extended+withdeploy linux/amd64 BuildDate=2026-09-09T14:45:02Z VendorInfo=hugo-python-distributions
+
+
+                  │ RU  
+──────────────────┼─────
+ Pages            │  68 
+ Paginator pages  │   0 
+ Non-page files   │  31 
+ Static files     │ 721 
+ Processed images │ 114 
+ Aliases          │   0 
+ Cleaned          │   0 
+
+Built in 3636 ms
+Environment: "development"
+Serving pages from disk
+Running in Fast Render Mode. For full rebuilds on change: hugo server --disableFastRender
+Web Server is available at http://localhost:1320/ (bind address 127.0.0.1) 
+Press Ctrl+C to stop

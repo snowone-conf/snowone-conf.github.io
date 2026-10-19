@@ -12,16 +12,13 @@
       <fieldset class="CfpForm__group">
         <legend class="CfpForm__legend">Выступление</legend>
         {{ partial "cfp-field.html" (dict "path" "talk.title" "label" "Название" "required" true "min" 5 "max" 150) }}
-        <div class="CfpForm__row">
-          {{ partial "cfp-field.html" (dict "path" "talk.format" "label" "Формат" "type" "select" "required" true "options" (slice
-            (dict "value" "talk" "label" "Доклад")
-            (dict "value" "workshop" "label" "Воркшоп")
-            (dict "value" "conversation" "label" "Обсуждение")
-            (dict "value" "other" "label" "Другое")) ) }}
-          {{ partial "cfp-field.html" (dict "path" "talk.language" "label" "Язык" "type" "select" "required" true "options" (slice
-            (dict "value" "ru" "label" "Русский")
-            (dict "value" "en" "label" "English")) ) }}
-        </div>
+        {{ partial "cfp-field.html" (dict "path" "talk.format" "label" "Формат" "type" "select" "required" true "options" (slice
+          (dict "value" "talk" "label" "Доклад")
+          (dict "value" "workshop" "label" "Воркшоп")
+          (dict "value" "conversation" "label" "Обсуждение")
+          (dict "value" "other" "label" "Другое")) ) }}
+        {{- /* Язык в форме не спрашиваем: по умолчанию русский, ПК может поменять его в карточке */}}
+        <input type="hidden" data-path="talk.language" value="ru">
         <div data-format-note hidden>
           {{ partial "cfp-field.html" (dict "path" "talk.formatNote" "label" "Опишите формат" "type" "textarea" "rows" 2 "max" 300 "hint" "Например: живое программирование, панельная дискуссия, разбор кейсов.") }}
         </div>
@@ -65,7 +62,7 @@
 
     <div class="CfpForm__done" data-done hidden tabindex="-1">
       <h2>Заявка отправлена</h2>
-      <p>Номер заявки — <strong data-done-id></strong>. Программный комитет прочитает её и напишет вам на e-mail.</p>
+      <p>Номер заявки — <strong data-done-id></strong>. Программный комитет прочитает её и свяжется с вами.</p>
       <p>Если что-то нужно поправить, напишите на <a href="mailto:{{ hugo.Data.conference.contacts.support }}">{{ hugo.Data.conference.contacts.support }}</a> и укажите номер заявки.</p>
     </div>
     {{- end }}
