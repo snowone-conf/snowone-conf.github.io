@@ -37,7 +37,11 @@ params:
   # Приём докладов (CFP)
   cfp:
     open: true
-    url: "mailto:support@snowone.ru?subject=SnowOne%20CFP"  # позже — ссылка на Яндекс Форму
+    url: "mailto:support@snowone.ru?subject=SnowOne%20CFP"  # на запуске — /callforpapers/apply/
+    # Форма заявки /callforpapers/apply/ отправляет заявки в сервис cfp-function (Cloud.ru).
+    api: https://cfp-function.containerapps.ru
+    # Версия текста согласия /callforpapers/consent/: сохраняется вместе с заявкой. Меняйте при правке текста.
+    consentVersion: "2026-10"
   # Подписка на новости: кнопка ведёт в Telegram-канал. Пусто — баннера нет.
   subscription:
     url: https://t.me/snowone_news

@@ -1,0 +1,79 @@
+{{ define "main" }}
+{{- $cfp := site.Params.cfp -}}
+<div class="CallforpapersContent_callforpapersContent__9ac97">
+  <div class="CallforpapersContent_callforpapersContent__container__kmO80 CfpForm__page">
+    <h1 class="CfpForm__title">{{ .Title }}</h1>
+    {{- if not $cfp.open }}
+    <p class="SitePlaceholder">Приём заявок закрыт. Следите за новостями в <a href="{{ site.Params.subscription.url }}">Telegram-канале</a>.</p>
+    {{- else }}
+    <div class="CfpForm__intro">{{ .Content }}</div>
+
+    <form class="CfpForm" novalidate data-cfp-form data-api="{{ $cfp.api }}" data-consent-version="{{ $cfp.consentVersion }}">
+      <fieldset class="CfpForm__group">
+        <legend class="CfpForm__legend">Выступление</legend>
+        {{ partial "cfp-field.html" (dict "path" "talk.title" "label" "Название" "required" true "min" 5 "max" 150) }}
+        <div class="CfpForm__row">
+          {{ partial "cfp-field.html" (dict "path" "talk.format" "label" "Формат" "type" "select" "required" true "options" (slice
+            (dict "value" "talk" "label" "Доклад")
+            (dict "value" "workshop" "label" "Воркшоп")
+            (dict "value" "conversation" "label" "Обсуждение")
+            (dict "value" "other" "label" "Другое")) ) }}
+          {{ partial "cfp-field.html" (dict "path" "talk.language" "label" "Язык" "type" "select" "required" true "options" (slice
+            (dict "value" "ru" "label" "Русский")
+            (dict "value" "en" "label" "English")) ) }}
+        </div>
+        <div data-format-note hidden>
+          {{ partial "cfp-field.html" (dict "path" "talk.formatNote" "label" "Опишите формат" "type" "textarea" "rows" 2 "max" 300 "hint" "Например: живое программирование, панельная дискуссия, разбор кейсов.") }}
+        </div>
+        {{ partial "cfp-field.html" (dict "path" "talk.summary" "label" "Краткое описание" "type" "textarea" "required" true "min" 50 "max" 300 "rows" 3 "hint" "Один абзац для анонса в списке докладов.") }}
+        {{ partial "cfp-field.html" (dict "path" "talk.description" "label" "Подробное описание" "type" "textarea" "required" true "min" 200 "max" 5000 "rows" 10 "hint" "О чём расскажете, для кого, что слушатели унесут с собой. Можно в несколько абзацев.") }}
+      </fieldset>
+
+      {{ partial "cfp-speaker.html" 0 }}
+      <button class="CfpForm__secondaryButton" type="button" data-add-speaker>Добавить второго спикера</button>
+      {{ partial "cfp-speaker.html" 1 }}
+
+      <fieldset class="CfpForm__group">
+        <legend class="CfpForm__legend">Для программного комитета</legend>
+        {{ partial "cfp-field.html" (dict "path" "pcComment" "label" "Комментарий" "type" "textarea" "rows" 3 "max" 2000 "hint" "Всё, что стоит знать комитету: пожелания по дню, готовность к другому формату, «на студенческий день». На сайте не публикуется.") }}
+      </fieldset>
+
+      {{- /* Ловушка для ботов: людям не видна, заполненная — заявка молча отбрасывается */ -}}
+      <div class="CfpForm__trap" aria-hidden="true">
+        <label>Сайт компании <input type="text" name="company_site" tabindex="-1" autocomplete="off" data-trap></label>
+      </div>
+
+      <div class="CfpForm__consents">
+        <div class="CfpForm__field" data-field="consents.personalData">
+          <label class="CfpForm__check"><input type="checkbox" data-path="consents.personalData" required>
+            <span>Даю <a href="/callforpapers/consent/" target="_blank">согласие на обработку персональных данных</a>, включая передачу части данных в Trello и Telegram<span class="CfpForm__required" aria-hidden="true"> *</span></span></label>
+          <p class="CfpForm__error" role="alert" hidden></p>
+        </div>
+        <div class="CfpForm__field" data-field="consents.publication">
+          <label class="CfpForm__check"><input type="checkbox" data-path="consents.publication" required>
+            <span>Если заявку примут, разрешаю опубликовать на сайте имя, компанию, должность, биографию, фото, ссылки и описание выступления (<a href="/callforpapers/consent/#7-согласие-на-публикацию" target="_blank">подробнее</a>)<span class="CfpForm__required" aria-hidden="true"> *</span></span></label>
+          <p class="CfpForm__error" role="alert" hidden></p>
+        </div>
+      </div>
+
+      <div class="CfpForm__error CfpForm__error_form" data-form-error role="alert" hidden></div>
+      <div class="CfpForm__submit">
+        <button class="CallforpapersLink_callforpapersLink__submit__mEtMo CfpForm__submitButton" type="submit">Отправить заявку</button>
+        <p class="CfpForm__status" data-status aria-live="polite"></p>
+      </div>
+    </form>
+
+    <div class="CfpForm__done" data-done hidden tabindex="-1">
+      <h2>Заявка отправлена</h2>
+      <p>Номер заявки — <strong data-done-id></strong>. Программный комитет прочитает её и напишет вам на e-mail.</p>
+      <p>Если что-то нужно поправить, напишите на <a href="mailto:{{ hugo.Data.conference.contacts.support }}">{{ hugo.Data.conference.contacts.support }}</a> и укажите номер заявки.</p>
+    </div>
+    {{- end }}
+  </div>
+</div>
+{{- if $cfp.open }}
+{{ with resources.Get "js/cfp-form.js" | js.Build (dict "minify" true) | fingerprint }}
+<script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" defer></script>
+{{ end }}
+{{- end }}
+{{ end }}
