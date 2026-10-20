@@ -30,12 +30,18 @@
       </div>
     </div>
     <div class="">
-      {{- with $talks }}
+      {{- if $talks }}
       <div class="PersonActivities_personActivities__current__8Asrz">
         <h2 class="PersonActivitiesCurrent_personActivitiesCurrent__title__SmZ0O">Выступления в сезоне {{ $season }}</h2>
         <ul class="TalksList_talksList__asFpU" data-detailed="false">
-          {{- range . }}<li class="TalksList_talksList__item__dlj6p">{{ partial "talk-card.html" . }}</li>{{ end }}
+          {{- range $talks }}<li class="TalksList_talksList__item__dlj6p">{{ partial "talk-card.html" . }}</li>{{ end }}
         </ul>
+      </div>
+      {{- else if eq .Params.season $season }}
+      {{- /* Спикер опубликован раньше выступления (колонка «Опубликовали спикера» в Trello) */}}
+      <div class="PersonActivities_personActivities__current__8Asrz">
+        <h2 class="PersonActivitiesCurrent_personActivitiesCurrent__title__SmZ0O">Выступления в сезоне {{ $season }}</h2>
+        {{ partial "placeholder.html" "Описание выступления появится здесь позже" }}
       </div>
       {{- end }}
       {{- with .Params.past_talks }}

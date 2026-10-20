@@ -1,23 +1,30 @@
 #!/usr/bin/env python3
-"""Страницы спикера и выступления из карточки Trello — для workflow cfp-accept.
+"""Публикация на сайте из карточки Trello — для workflow cfp-accept.
 
-    python3 tools/cfp_from_trello.py build --card <ссылка или короткий код> --summary out.json
+    python3 tools/cfp_from_trello.py run --card <ссылка или код> --mode speaker|talk [--update] [--recreate]
+        [--from talk|speaker] [--by "Имя"] --summary out.json
     python3 tools/cfp_from_trello.py comment --card <код> --text "…"
 
 Карточку заполняет сервис cfp-function по шаблону, а программный комитет правит её во время
 обсуждения. Шаблон и правила разбора — docs/schema.md репозитория cfp-function (§3, §4).
-Создаются:
-  content/persons/<имя-фамилия>/index.ru.md и photo.jpg (если спикера ещё нет на сайте)
-  content/talks/<спикер>---<название>/index.ru.md — без draft и без расписания
 
-Ключ и токен Trello — из переменных окружения TRELLO_KEY и TRELLO_TOKEN.
-Итог (номер заявки, ветка, заметки для ревьюера или текст ошибки) пишется в --summary в JSON.
+Режимы (колонки Trello):
+  speaker — «Опубликовали спикера»: только страница спикера content/persons/<имя-фамилия>/ с season:
+            спикер появляется на главной, на его странице — «описание выступления появится позже»;
+  talk    — «Опубликовали доклад»: выступление content/talks/<спикер>---<название>/ (без draft и
+            без расписания) и спикер, если его ещё нет на сайте.
+Скрипт сначала решает, нужно ли что-то собирать (PR уже открыт, доклад уже на сайте, ошибочный
+перенос…), и пишет решение в --summary (JSON): action = build | skip, данные для PR и для
+сообщения в чат ПК (kind, reason, …). Тексты сообщений собирает сервис cfp-function.
+
+Ключ и токен Trello — из переменных окружения TRELLO_KEY и TRELLO_TOKEN; открытые PR — через gh.
 """
 import argparse
 import glob
 import json
 import os
 import re
+import subprocess
 import sys
 import urllib.parse
 import urllib.request
@@ -71,15 +78,11 @@ def required(value, field, section):
     return value
 
 
-def parse_card(desc):
-    """Описание карточки → {talk: {...}, speakers: [{...}], cfp_id}. Ошибки — CardError с текстом из схемы."""
-    desc = unescape(desc.replace("\r\n", "\n"))
-    secs = sections(desc)
-    if "выступление" not in secs or "спикер" not in secs:
-        missing = "## Выступление" if "выступление" not in secs else "## Спикер"
-        raise CardError(f"Не нашёл раздел «{missing}» в описании карточки. Верните заголовок из шаблона.")
+def missing_section(name):
+    return CardError(f"Не нашёл раздел «## {name}» в описании карточки. Верните заголовок из шаблона.")
 
-    fields, subs = secs["выступление"]
+
+def parse_talk(fields, subs):
     raw_format = required(fields.get("формат", ""), "Формат", "Выступление")
     fmt = raw_format.lower()
     if fmt in ("другое", "other"):
@@ -89,13 +92,25 @@ def parse_card(desc):
     raw_lang = required(fields.get("язык", ""), "Язык", "Выступление")
     if raw_lang.lower() not in LANGUAGES:
         raise CardError(f"Язык «{raw_lang}» не распознан. Допустимо: Русский, English.")
-    talk = {
+    return {
         "title": required(fields.get("название", ""), "Название", "Выступление"),
         "format": FORMATS[fmt],
         "language": LANGUAGES[raw_lang.lower()],
         "summary": " ".join(required(subs.get("кратко", ""), "Кратко", "Выступление").split()),
         "description": paragraphs(required(subs.get("подробно", ""), "Подробно", "Выступление")),
     }
+
+
+def parse_card(desc, mode="talk"):
+    """Описание карточки → {talk, speakers, cfp_id}. В режиме speaker раздел «Выступление» не проверяется
+    (тема может быть ещё не готова), talk = None. Ошибки — CardError с текстом из схемы."""
+    desc = unescape(desc.replace("\r\n", "\n"))
+    secs = sections(desc)
+    if mode == "talk" and "выступление" not in secs:
+        raise missing_section("Выступление")
+    if "спикер" not in secs:
+        raise missing_section("Спикер")
+    talk = parse_talk(*secs["выступление"]) if mode == "talk" else None
 
     speakers = []
     for number, name in ((1, "спикер"), (2, "спикер 2")):
@@ -117,23 +132,77 @@ def parse_card(desc):
     return {"talk": talk, "speakers": speakers, "cfp_id": m.group(1) if m else ""}
 
 
-# --- страницы сайта ---
+# --- что уже есть на сайте ---
 
 def front(path):
     with open(path, encoding="utf-8") as fh:
         text = fh.read()
-    return yaml.safe_load(text.split("---", 2)[1]) or {} if text.startswith("---") else {}
+    if not text.startswith("---"):
+        return {}
+    return yaml.safe_load(text.split("---", 2)[1]) or {}
 
 
 def known_persons(content):
-    """Имя → папка персоны: у спикеров прошлых лет папки — хеши, искать можно только по имени."""
+    """Имя (в нижнем регистре) → {id, path, season}: у спикеров прошлых лет папки — хеши, искать можно только по имени."""
     out = {}
-    for f in sorted(glob.glob(os.path.join(content, "persons", "*", "index.*.md"))):
-        title = str(front(f).get("title", "")).strip().lower()
-        if title:
-            out.setdefault(title, os.path.basename(os.path.dirname(f)))
+    for f in sorted(glob.glob(os.path.join(content, "persons", "*", "index.ru.md"))):
+        fm = front(f)
+        title = str(fm.get("title", "")).strip().lower()
+        if title and title not in out:
+            out[title] = {"id": os.path.basename(os.path.dirname(f)), "path": f, "season": fm.get("season")}
     return out
 
+
+def published_talks(content, cfp_id):
+    """Папки выступлений с этим номером заявки."""
+    if not cfp_id:
+        return []
+    return [f"content/talks/{os.path.basename(os.path.dirname(f))}/"
+            for f in sorted(glob.glob(os.path.join(content, "talks", "*", "index.ru.md")))
+            if str(front(f).get("cfp_id", "")) == cfp_id]
+
+
+def speakers_published(card, content, season):
+    """Все спикеры карточки уже на сайте и отмечены в этом сезоне."""
+    known = known_persons(content)
+    return all((known.get(sp["name"].lower()) or {}).get("season") == season for sp in card["speakers"])
+
+
+# --- решение ---
+
+def decide(mode, update, recreate, talk_paths, speakers_done, speaker_pr, talk_pr):
+    """Что делать с карточкой. Возвращает {action: build|skip, kind, reason, pr_url}.
+    speaker_pr / talk_pr — ссылки на открытые PR этой заявки (или пустые строки)."""
+    def skip(kind, reason="", pr=""):
+        return {"action": "skip", "kind": kind, "reason": reason, "pr_url": pr}
+
+    def build(pr=""):
+        return {"action": "build", "kind": "pr-updated" if update else "pr-ready", "reason": "", "pr_url": pr}
+
+    own_pr = speaker_pr if mode == "speaker" else talk_pr
+    if update:
+        # Правка описания: пересобираем только открытый PR своего режима
+        if own_pr and not (mode == "speaker" and (talk_paths or talk_pr)):
+            return build(own_pr)
+        return skip("warning", "update-no-pr")
+    if mode == "speaker":
+        if talk_paths:
+            return skip("warning", "talk-published")
+        if talk_pr:
+            return skip("warning", "talk-pr-open", talk_pr)
+        if speaker_pr:
+            return build(speaker_pr) if recreate else skip("pr-exists", pr=speaker_pr)
+        if speakers_done:
+            return skip("warning", "speaker-published")
+        return build()
+    if talk_paths:
+        return skip("warning", "talk-already")
+    if talk_pr:
+        return build(talk_pr) if recreate else skip("pr-exists", pr=talk_pr)
+    return build()
+
+
+# --- страницы ---
 
 def free_dir(section_dir, slug):
     """Свободная папка: slug, затем slug-2, slug-3…"""
@@ -155,19 +224,34 @@ def site_contacts(sp):
     return out
 
 
-def build(card, photos, content, season):
-    """Создаёт страницы; photos — {номер спикера: (байты, расширение)}. Возвращает (папки, заметки)."""
-    notes, created = [], []
+def mark_season(path, season):
+    """Добавляет season в frontmatter существующей персоны, не трогая остальное."""
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
+    head, sep, rest = text[3:].partition("\n---")
+    head = re.sub(r"^season:.*\n?", "", head, flags=re.M).rstrip("\n")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("---" + head + f"\nseason: {season}" + sep + rest)
+
+
+def build_persons(card, photos, content, season, mode):
+    """Страницы спикеров. Новые персоны получают season; в режиме speaker уже известным
+    (выступали раньше) season дописывается, биография и фото не меняются. → (ids, изменения, заметки)"""
+    notes, changed, ids = [], [], []
     persons_dir = os.path.join(content, "persons")
-    talks_dir = os.path.join(content, "talks")
     known = known_persons(content)
-    speaker_ids = []
     for sp in card["speakers"]:
         existing = known.get(sp["name"].lower())
         if existing:
-            speaker_ids.append(existing)
-            notes.append(f"Спикер «{sp['name']}» уже есть на сайте (content/persons/{existing}/): проверьте, "
-                         "тот ли это человек, и при необходимости обновите биографию и фото вручную.")
+            ids.append(existing["id"])
+            rel = f"content/persons/{existing['id']}/"
+            if existing["season"] == season:
+                continue
+            notes.append(f"Спикер «{sp['name']}» уже есть на сайте ({rel}): проверьте, тот ли это человек, "
+                         "и при необходимости обновите биографию и фото вручную.")
+            if mode == "speaker":
+                mark_season(existing["path"], season)
+                changed.append(rel)
             continue
         if sp["number"] not in photos:
             raise CardError(f"У спикера «{sp['name']}» нет фото: приложите вложение speaker-{sp['number']}.jpg.")
@@ -186,30 +270,39 @@ def build(card, photos, content, season):
             "position": sp["position"],
             "photo": "photo." + ext,
             "weight": 100,
+            "season": season,
             "contacts": site_contacts(sp),
         }, sp["bio"], False)
-        speaker_ids.append(pid)
-        created.append(f"content/persons/{pid}/")
+        ids.append(pid)
+        changed.append(f"content/persons/{pid}/")
+    return ids, changed, notes
 
+
+def build(card, photos, content, season, mode="talk"):
+    """Создаёт страницы режима; photos — {номер спикера: (байты, расширение)}. → (изменения, заметки)"""
+    ids, changed, notes = build_persons(card, photos, content, season, mode)
+    if mode == "speaker":
+        return changed, notes
     t = card["talk"]
-    slug = f"{speaker_ids[0]}---{slugify(t['title'])}"
+    talks_dir = os.path.join(content, "talks")
+    slug = f"{ids[0]}---{slugify(t['title'])}"
     tid = free_dir(talks_dir, slug)
     if tid != slug:
         notes.append(f"Папка content/talks/{slug}/ уже занята, выступление записано в {tid}/.")
     write_md(os.path.join(talks_dir, tid, "index.ru.md"), {
         "title": t["title"],
         "format": t["format"],
-        "speakers": speaker_ids,
+        "speakers": ids,
         "language": t["language"],
         "summary": t["summary"],
         "season": season,
         "cfp_id": card["cfp_id"],
     }, t["description"], False)
-    created.append(f"content/talks/{tid}/")
-    return created, notes
+    changed.append(f"content/talks/{tid}/")
+    return changed, notes
 
 
-# --- Trello ---
+# --- Trello и GitHub ---
 
 def auth_header():
     key, token = os.environ.get("TRELLO_KEY"), os.environ.get("TRELLO_TOKEN")
@@ -259,40 +352,71 @@ def comment(code, text):
     http(f"{API}/cards/{code}/actions/comments", data=urllib.parse.urlencode({"text": text}).encode(), method="POST")
 
 
+def open_pr(branch):
+    """Ссылка на открытый PR из ветки или пустая строка."""
+    out = subprocess.run(["gh", "pr", "list", "--head", branch, "--state", "open", "--json", "url",
+                          "--jq", ".[0].url // \"\""], capture_output=True, text=True, check=True)
+    return out.stdout.strip()
+
+
 # --- запуск ---
+
+def run(args, content=CONTENT):
+    code = card_code(args.card)
+    s = {"card": code, "cardUrl": f"https://trello.com/c/{code}", "title": code, "mode": args.mode,
+         "from": args.from_list, "by": args.by, "update": args.update, "notes": [], "created": [], "paths": []}
+    try:
+        card = fetch_card(code)
+        s.update(cardUrl=card.get("shortUrl", s["cardUrl"]), title=card.get("name", code))
+        parsed = parse_card(card.get("desc", ""), args.mode)
+        cfp_id = parsed["cfp_id"] or code
+        if parsed["talk"]:
+            s["title"] = parsed["talk"]["title"]
+        s["speakers"] = [sp["name"] for sp in parsed["speakers"]]
+        with open(os.path.join(ROOT, "data", "conference.yaml"), encoding="utf-8") as fh:
+            season = yaml.safe_load(fh)["season"]
+        branches = {m: f"cfp/{cfp_id}-{m}" for m in ("speaker", "talk")}
+        prs = {m: open_pr(b) for m, b in branches.items()}
+        talk_paths = published_talks(content, parsed["cfp_id"])
+        verdict = decide(args.mode, args.update, args.recreate, talk_paths,
+                         speakers_published(parsed, content, season), prs["speaker"], prs["talk"])
+        s.update(cfp_id=cfp_id, branch=branches[args.mode], action=verdict["action"], kind=verdict["kind"],
+                 reason=verdict["reason"], prUrl=verdict["pr_url"], paths=talk_paths)
+        if verdict["reason"] == "update-no-pr" and args.mode == "speaker" and not talk_paths:
+            known = known_persons(content)
+            s["paths"] = [f"content/persons/{known[n.lower()]['id']}/" for n in s["speakers"] if n.lower() in known]
+        if verdict["action"] == "build":
+            s["created"], s["notes"] = build(parsed, fetch_photos(card), content, season, args.mode)
+            if args.mode == "talk" and prs["speaker"]:
+                s["supersede"] = prs["speaker"]
+        s["ok"] = True
+    except CardError as e:
+        s.update(ok=False, kind="error", message=str(e))
+    except Exception as e:  # сеть, Trello, gh, диск — тоже в карточку и в чат
+        s.update(ok=False, kind="error", message=f"сбой сборки: {e}")
+    return s
+
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
-    b = sub.add_parser("build", help="создать страницы по карточке")
-    b.add_argument("--card", required=True)
-    b.add_argument("--summary", required=True, help="куда записать итог в JSON")
+    r = sub.add_parser("run", help="решить и при необходимости создать страницы по карточке")
+    r.add_argument("--card", required=True)
+    r.add_argument("--mode", choices=("speaker", "talk"), required=True)
+    r.add_argument("--update", action="store_true", help="запуск по правке описания карточки")
+    r.add_argument("--recreate", action="store_true", help="пересобрать открытый PR")
+    r.add_argument("--from", dest="from_list", default="", help="колонка до переноса: speaker, talk или пусто")
+    r.add_argument("--by", default="", help="кто перенёс или поправил карточку")
+    r.add_argument("--summary", required=True, help="куда записать итог в JSON")
     c = sub.add_parser("comment", help="комментарий в карточку")
     c.add_argument("--card", required=True)
     c.add_argument("--text", required=True)
     args = ap.parse_args()
 
-    code = card_code(args.card)
     if args.cmd == "comment":
-        comment(code, args.text)
+        comment(card_code(args.card), args.text)
         return
-
-    summary = {"card": code, "cardUrl": f"https://trello.com/c/{code}", "title": code}
-    try:
-        card = fetch_card(code)
-        summary.update(cardUrl=card.get("shortUrl", summary["cardUrl"]), title=card.get("name", code))
-        parsed = parse_card(card.get("desc", ""))
-        summary["title"] = parsed["talk"]["title"]
-        summary["cfp_id"] = parsed["cfp_id"] or code
-        with open(os.path.join(ROOT, "data", "conference.yaml"), encoding="utf-8") as fh:
-            season = yaml.safe_load(fh)["season"]
-        created, notes = build(parsed, fetch_photos(card), CONTENT, season)
-        summary.update(ok=True, branch=f"cfp/{summary['cfp_id']}", created=created, notes=notes,
-                       speakers=[s["name"] for s in parsed["speakers"]])
-    except CardError as e:
-        summary.update(ok=False, error=str(e))
-    except Exception as e:  # сеть, Trello, диск — тоже в карточку и в чат
-        summary.update(ok=False, error=f"сбой сборки: {e}")
+    summary = run(args)
     with open(args.summary, "w", encoding="utf-8") as fh:
         json.dump(summary, fh, ensure_ascii=False, indent=2)
     print(json.dumps(summary, ensure_ascii=False, indent=2))

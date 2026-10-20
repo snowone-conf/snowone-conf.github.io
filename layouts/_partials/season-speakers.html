@@ -1,4 +1,5 @@
-{{- /* Возвращает докладчиков текущего сезона (персоны из поля speakers докладов), по weight. */ -}}
+{{- /* Возвращает спикеров текущего сезона по weight: персон из поля speakers докладов сезона
+     и персон с season текущего сезона (спикер опубликован раньше своего выступления). */ -}}
 {{- $season := hugo.Data.conference.season -}}
 {{- $ids := slice -}}
 {{- range where (where site.RegularPages "Section" "talks") "Params.season" $season -}}
@@ -7,6 +8,6 @@
 {{- $ids = $ids | uniq -}}
 {{- $persons := slice -}}
 {{- range (where site.RegularPages "Section" "persons").ByWeight -}}
-  {{- if in $ids .File.ContentBaseName -}}{{- $persons = $persons | append . -}}{{- end -}}
+  {{- if or (in $ids .File.ContentBaseName) (eq .Params.season $season) -}}{{- $persons = $persons | append . -}}{{- end -}}
 {{- end -}}
 {{- return $persons -}}

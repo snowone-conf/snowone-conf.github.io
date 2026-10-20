@@ -1,12 +1,15 @@
-# Приём в программу: PR со страницами спикера и выступления из карточки Trello.
-# Запуск — сервис cfp-function, когда карточку переносят в «Приняли в программу» (repository_dispatch),
-# или вручную: Actions → CFP: приём в программу → Run workflow, ссылка на карточку.
-# PR собирается из текущего описания карточки (tools/cfp_from_trello.py), без draft и без расписания.
-# Если PR по заявке уже открыт, он не пересобирается — нужен ручной запуск с «пересоздать».
+# Публикация на сайте из карточки Trello.
+# Запуск — сервис cfp-function, когда карточку переносят в «Опубликовали спикера ⚡» (mode=speaker)
+# или «Опубликовали доклад ⚡» (mode=talk), либо правят её описание в этих колонках (update=true);
+# или вручную: Actions → «CFP: публикация из карточки» → Run workflow.
+# Что делать, решает tools/cfp_from_trello.py: собрать PR (страница спикера; выступление и спикер)
+# или ничего не делать и объяснить почему (PR уже есть, доклад уже на сайте, ошибочный перенос…).
+# Итог уходит событием в cfp-function: сервис пишет сообщение в чат ПК и возвращает его текст —
+# он же становится комментарием в карточке.
 #
 # Секреты: TRELLO_KEY, TRELLO_TOKEN (служебный аккаунт Trello), EVENTS_SECRET (общий с cfp-function).
-# Переменная: CFP_SERVICE_URL — адрес cfp-function, туда уходят события для сообщений в чат ПК.
-name: "CFP: приём в программу"
+# Переменная: CFP_SERVICE_URL — адрес cfp-function.
+name: "CFP: публикация из карточки"
 
 on:
   repository_dispatch:
@@ -16,8 +19,13 @@ on:
       card:
         description: Ссылка на карточку Trello или её короткий код
         required: true
+      mode:
+        description: "Что публиковать: speaker — только спикера, talk — доклад (и спикера, если его ещё нет)"
+        type: choice
+        options: [speaker, talk]
+        default: talk
       recreate:
-        description: Пересоздать PR из текущей карточки, даже если он уже есть
+        description: Пересобрать открытый PR из текущей карточки
         type: boolean
         default: false
 
@@ -29,10 +37,14 @@ concurrency:
   group: cfp-accept-${{ github.event.client_payload.card || inputs.card }}
 
 jobs:
-  accept:
+  publish:
     runs-on: ubuntu-latest
     env:
       CARD: ${{ github.event.client_payload.card || inputs.card }}
+      MODE: ${{ github.event.client_payload.mode || inputs.mode }}
+      UPDATE: ${{ github.event.client_payload.update || false }}
+      FROM: ${{ github.event.client_payload.from || '' }}
+      BY: ${{ github.event.client_payload.by || format('ручной запуск {0}', github.actor) }}
       RECREATE: ${{ inputs.recreate || false }}
       TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
       TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
@@ -40,6 +52,7 @@ jobs:
       CFP_SERVICE_URL: ${{ vars.CFP_SERVICE_URL }}
       GH_TOKEN: ${{ github.token }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
       SUMMARY: /tmp/cfp-summary.json
     steps:
       - uses: actions/checkout@v4
@@ -54,59 +67,72 @@ jobs:
           sudo dpkg -i /tmp/hugo.deb
           pip install --quiet pyyaml
 
-      - name: Pages from the card
-        run: python3 tools/cfp_from_trello.py build --card "$CARD" --summary "$SUMMARY"
-
-      - name: Existing PR
-        id: existing
+      # Событие в cfp-function (сообщение в чат) и тот же текст — комментарием в карточку.
+      # $1 — jq-выражение поверх итога скрипта, например '. + {prUrl: $pr}'
+      - name: Event helper
         run: |
-          branch=$(jq -r .branch "$SUMMARY")
-          pr=$(gh pr list --head "$branch" --state open --json url --jq '.[0].url // ""')
-          echo "branch=$branch" >> "$GITHUB_OUTPUT"
-          echo "pr=$pr" >> "$GITHUB_OUTPUT"
-          if [ -n "$pr" ] && [ "$RECREATE" != "true" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          fi
+          cat > /tmp/cfp-event.sh <<'EOF'
+          report() {
+            jq --arg run "$RUN_URL" --arg pr "${PR:-}" "${1:-.} | {kind, reason, mode, from, by, title, speakers,
+                cardUrl, prUrl, paths, notes, message, runUrl: \$run}" "$SUMMARY" > /tmp/event.json
+            text=$(curl -fsS -X POST -H "Authorization: Bearer $EVENTS_SECRET" -H "Content-Type: application/json" \
+              --data @/tmp/event.json "$CFP_SERVICE_URL/api/events" | jq -r .text) || text=""
+            if [ -z "$text" ]; then
+              text="$(jq -r '.kind + ": " + (.message // .prUrl // .reason // "")' /tmp/event.json) ($RUN_URL)"
+            fi
+            python3 tools/cfp_from_trello.py comment --card "$CARD" --text "$text" || true
+          }
+          EOF
 
-      - name: Remind about the existing PR
-        if: steps.existing.outputs.skip == 'true'
-        env:
-          PR: ${{ steps.existing.outputs.pr }}
+      - name: Decide and build pages
         run: |
-          python3 tools/cfp_from_trello.py comment --card "$CARD" \
-            --text "PR по этой заявке уже есть: $PR. Чтобы пересобрать его из текущей карточки, запустите cfp-accept вручную с флагом «пересоздать»: $RUN_URL"
-          jq -n --slurpfile s "$SUMMARY" --arg pr "$PR" \
-            '{kind: "pr-exists", title: $s[0].title, cardUrl: $s[0].cardUrl, prUrl: $pr}' > /tmp/event.json
-          curl -fsS -X POST -H "Authorization: Bearer $EVENTS_SECRET" -H "Content-Type: application/json" \
-            --data @/tmp/event.json "$CFP_SERVICE_URL/api/events"
+          flags=()
+          [ "$UPDATE" = "true" ] && flags+=(--update)
+          [ "$RECREATE" = "true" ] && flags+=(--recreate)
+          python3 tools/cfp_from_trello.py run --card "$CARD" --mode "$MODE" --from "$FROM" --by "$BY" \
+            "${flags[@]}" --summary "$SUMMARY"
+          echo "ACTION=$(jq -r .action "$SUMMARY")" >> "$GITHUB_ENV"
+
+      - name: Nothing to build — explain
+        if: env.ACTION == 'skip'
+        run: |
+          source /tmp/cfp-event.sh
+          report
 
       - name: Site checks
-        if: steps.existing.outputs.skip != 'true'
+        if: env.ACTION == 'build'
         run: |
           python3 tools/check_refs.py
           hugo --gc --minify --panicOnWarning --destination /tmp/snowone-check >/dev/null
 
       - name: Branch and PR
-        if: steps.existing.outputs.skip != 'true'
-        id: pr
-        env:
-          BRANCH: ${{ steps.existing.outputs.branch }}
-          EXISTING: ${{ steps.existing.outputs.pr }}
+        if: env.ACTION == 'build'
         run: |
-          title=$(jq -r .title "$SUMMARY")
+          branch=$(jq -r .branch "$SUMMARY")
+          existing=$(jq -r '.prUrl // ""' "$SUMMARY")
           cfp_id=$(jq -r .cfp_id "$SUMMARY")
           card_url=$(jq -r .cardUrl "$SUMMARY")
+          names=$(jq -r '.speakers | join(", ")' "$SUMMARY")
+          if [ "$MODE" = "speaker" ]; then
+            title="CFP: спикер $names"
+            what="Спикер $names опубликован раньше выступления: на его странице — «Описание выступления появится здесь позже»."
+          else
+            title="CFP: $(jq -r .title "$SUMMARY")"
+            what="Выступление «$(jq -r .title "$SUMMARY")» ($names). Публикуется без расписания: день, время и зал проставляются позже."
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B "$BRANCH"
+          git checkout -B "$branch"
           git add content
-          git commit -q -m "Приём в программу: $title" -m "Заявка $cfp_id, карточка $card_url"
-          # Ветка cfp/<номер заявки> принадлежит этому workflow, поэтому пересоздание — принудительный push
-          git push --force origin "$BRANCH"
+          git commit -q -m "$title" -m "Заявка $cfp_id, карточка $card_url"
+          # Ветки cfp/<номер>-<режим> принадлежат этому workflow, пересоздание — принудительный push
+          git push --force origin "$branch"
           {
-            echo "Выступление «$title» из карточки $card_url (заявка $cfp_id)."
+            echo "$what"
             echo
-            echo "Страницы:"
+            echo "Карточка: $card_url (заявка $cfp_id)."
+            echo
+            echo "Изменения:"
             jq -r '.created[] | "- `" + . + "`"' "$SUMMARY"
             if [ "$(jq '.notes | length' "$SUMMARY")" != "0" ]; then
               echo
@@ -114,42 +140,32 @@ jobs:
               jq -r '.notes[] | "- " + .' "$SUMMARY"
             fi
             echo
-            echo "Выступление публикуется без расписания: день, время и зал проставляются позже."
-            echo "Проверки сайта (\`check_refs.py\`, сборка Hugo) пройдены в [запуске cfp-accept]($RUN_URL): PR от GitHub Actions не запускает их сам."
-            echo
-            echo "Если нужно поправить текст — правьте карточку и запустите cfp-accept вручную с «пересоздать», или правьте файлы прямо в этом PR."
+            echo "Проверки сайта (\`check_refs.py\`, сборка Hugo) пройдены в [запуске]($RUN_URL): PR от GitHub Actions не запускает их сам."
+            echo "Правки текста — в карточке: пока PR открыт, правка описания карточки пересобирает его."
           } > /tmp/pr-body.md
-          if [ -n "$EXISTING" ]; then
-            gh pr edit "$EXISTING" --title "CFP: $title" --body-file /tmp/pr-body.md
-            echo "url=$EXISTING" >> "$GITHUB_OUTPUT"
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$title" --body-file /tmp/pr-body.md
+            url="$existing"
           else
-            url=$(gh pr create --head "$BRANCH" --base "${{ github.event.repository.default_branch }}" \
-              --title "CFP: $title" --body-file /tmp/pr-body.md)
-            echo "url=$url" >> "$GITHUB_OUTPUT"
+            url=$(gh pr create --head "$branch" --base "$DEFAULT_BRANCH" --title "$title" --body-file /tmp/pr-body.md)
           fi
+          supersede=$(jq -r '.supersede // ""' "$SUMMARY")
+          if [ -n "$supersede" ]; then
+            gh pr close "$supersede" --delete-branch --comment "Заменён PR $url: в нём и спикер, и доклад."
+            jq --arg old "$supersede" '.notes += ["PR только со спикером (" + $old + ") закрыт: спикер вошёл в этот PR."]' \
+              "$SUMMARY" > /tmp/s.json && mv /tmp/s.json "$SUMMARY"
+          fi
+          echo "PR=$url" >> "$GITHUB_ENV"
 
-      - name: Report to the card and the chat
-        if: steps.existing.outputs.skip != 'true'
-        env:
-          PR: ${{ steps.pr.outputs.url }}
+      - name: Report the PR
+        if: env.ACTION == 'build'
         run: |
-          python3 tools/cfp_from_trello.py comment --card "$CARD" --text "PR со страницами для сайта готов к ревью: $PR"
-          jq -n --slurpfile s "$SUMMARY" --arg pr "$PR" \
-            '{kind: "pr-ready", title: $s[0].title, cardUrl: $s[0].cardUrl, prUrl: $pr, notes: $s[0].notes}' > /tmp/event.json
-          curl -fsS -X POST -H "Authorization: Bearer $EVENTS_SECRET" -H "Content-Type: application/json" \
-            --data @/tmp/event.json "$CFP_SERVICE_URL/api/events"
+          source /tmp/cfp-event.sh
+          report '. + {prUrl: $pr}'
 
       - name: Report the failure
         if: failure()
         run: |
-          if [ -s "$SUMMARY" ] && [ "$(jq -r .ok "$SUMMARY")" = "false" ]; then
-            message=$(jq -r .error "$SUMMARY")
-          else
-            message="сбой на шаге проверки или публикации, подробности в запуске"
-          fi
-          python3 tools/cfp_from_trello.py comment --card "$CARD" \
-            --text "Не удалось собрать PR: $message Поправьте карточку и перенесите её в «Приняли в программу» ещё раз или запустите cfp-accept вручную. Запуск: $RUN_URL" || true
-          jq -n --arg card "$CARD" --arg msg "$message" --arg run "$RUN_URL" --slurpfile s <( [ -s "$SUMMARY" ] && cat "$SUMMARY" || echo '{}' ) \
-            '{kind: "error", title: ($s[0].title // $card), cardUrl: ($s[0].cardUrl // ("https://trello.com/c/" + $card)), message: $msg, runUrl: $run}' > /tmp/event.json
-          curl -fsS -X POST -H "Authorization: Bearer $EVENTS_SECRET" -H "Content-Type: application/json" \
-            --data @/tmp/event.json "$CFP_SERVICE_URL/api/events" || true
+          [ -s "$SUMMARY" ] || jq -n --arg card "$CARD" '{title: $card, cardUrl: ("https://trello.com/c/" + $card)}' > "$SUMMARY"
+          source /tmp/cfp-event.sh
+          report '. + {kind: "error", message: (if .ok == false then .message else "сбой на шаге проверки или публикации, подробности в запуске" end)}'
