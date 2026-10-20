@@ -1,0 +1,30 @@
+{{- /* Блок спикера формы заявки. Параметр — номер спикера с нуля. */ -}}
+{{- $i := . -}}
+{{- $p := printf "speakers[%d]." $i -}}
+<fieldset class="CfpForm__group" data-speaker="{{ $i }}"{{ if gt $i 0 }} hidden disabled{{ end }}>
+  <legend class="CfpForm__legend">{{ if eq $i 0 }}Спикер{{ else }}Второй спикер{{ end }}</legend>
+  {{- if gt $i 0 }}
+  <button class="CfpForm__linkButton" type="button" data-remove-speaker>Убрать второго спикера</button>
+  {{- end }}
+  <div class="CfpForm__row">
+    {{ partial "cfp-field.html" (dict "path" (print $p "name") "label" "Имя и фамилия" "required" true "min" 3 "max" 100 "autocomplete" (cond (eq $i 0) "name" "off")) }}
+    {{ partial "cfp-field.html" (dict "path" (print $p "city") "label" "Город" "required" true "max" 100) }}
+  </div>
+  <div class="CfpForm__row">
+    {{ partial "cfp-field.html" (dict "path" (print $p "company") "label" "Компания" "max" 100 "autocomplete" (cond (eq $i 0) "organization" "off")) }}
+    {{ partial "cfp-field.html" (dict "path" (print $p "position") "label" "Должность или род деятельности" "required" true "max" 100) }}
+  </div>
+  {{ partial "cfp-field.html" (dict "path" (print $p "bio") "label" "О себе" "type" "textarea" "required" true "min" 100 "max" 2000 "rows" 5 "hint" "Пара абзацев для страницы спикера: чем занимаетесь, что интересно.") }}
+  {{ partial "cfp-field.html" (dict "path" (print $p "photo") "label" "Фото" "type" "file" "required" true "hint" "JPEG или PNG, лучше квадратное; уменьшим до 1200 пикселей перед отправкой.") }}
+  <div class="CfpForm__row">
+    {{ partial "cfp-field.html" (dict "path" (print $p "website") "label" "Сайт или блог" "type" "url" "max" 300 "placeholder" "https://") }}
+    {{ partial "cfp-field.html" (dict "path" (print $p "github") "label" "GitHub" "max" 100 "placeholder" "логин или ссылка") }}
+  </div>
+  {{ partial "cfp-field.html" (dict "path" (print $p "pastTalks") "label" "Ссылки на прошлые выступления" "type" "textarea" "rows" 3 "hint" "До трёх ссылок, по одной в строке. На сайте не публикуются.") }}
+  <p class="CfpForm__note">Город и контакты видит только программный комитет, на сайте они не публикуются.</p>
+  <div class="CfpForm__row CfpForm__row_three">
+    {{ partial "cfp-field.html" (dict "path" (print $p "email") "label" "E-mail" "type" "email" "required" (eq $i 0) "max" 254 "autocomplete" (cond (eq $i 0) "email" "off")) }}
+    {{ partial "cfp-field.html" (dict "path" (print $p "phone") "label" "Телефон" "type" "tel" "max" 30 "autocomplete" (cond (eq $i 0) "tel" "off")) }}
+    {{ partial "cfp-field.html" (dict "path" (print $p "telegram") "label" "Telegram" "max" 100 "placeholder" "@nick") }}
+  </div>
+</fieldset>

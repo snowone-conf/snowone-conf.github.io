@@ -5,8 +5,9 @@
   * speakers/hosts докладов ссылаются на существующие content/persons/<id>/
   * члены программного комитета (data/committee.yaml) существуют
   * файлы photo/logo, указанные во frontmatter, лежат в бандле
-  * у докладов текущего сезона заполнены day/start/end/track и они согласованы
-    с data/conference.yaml (день существует, трек есть в этом дне, начало < конца)
+  * у докладов текущего сезона day/start/end/track заполнены все или ни одного (доклад без
+    расписания публикуется без времени), и они согласованы с data/conference.yaml
+    (день существует, трек есть в этом дне, начало < конца)
 
 Выход с кодом 1 при ошибках. Запуск: python3 tools/check_refs.py
 """
@@ -63,7 +64,10 @@ def main():
                         errors.append(f"{rel(f)}: {role} ссылается на несуществующую персону {pid}")
             if fm.get("draft") or fm.get("season") != conf.get("season") or not f.endswith(".ru.md"):
                 continue
-            missing = [k for k in ("day", "start", "end", "track") if not fm.get(k)]
+            schedule = ("day", "start", "end", "track")
+            missing = [k for k in schedule if not fm.get(k)]
+            if len(missing) == len(schedule):
+                continue  # принят в программу, но ещё не в расписании: публикуется без времени и зала
             if missing:
                 errors.append(f"{rel(f)}: не заполнены поля {', '.join(missing)}")
                 continue

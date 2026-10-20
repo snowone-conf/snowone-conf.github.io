@@ -1,0 +1,28 @@
+{{- /*
+  Поле формы заявки. Параметры: path — путь поля в JSON заявки (talk.title, speakers[0].email),
+  label, type (text, email, tel, url, textarea, select, file), required, min, max, hint, rows,
+  autocomplete, placeholder, options (для select: список {value, label}).
+*/ -}}
+{{- $id := printf "f-%s" (replaceRE `[^a-zA-Z0-9]+` "-" .path) -}}
+<div class="CfpForm__field" data-field="{{ .path }}">
+  <label class="CfpForm__label" for="{{ $id }}">{{ .label }}{{ if .required }}<span class="CfpForm__required" aria-hidden="true"> *</span>{{ end }}</label>
+  {{- with .hint }}<p class="CfpForm__hint" id="{{ $id }}-hint">{{ . }}</p>{{ end }}
+  {{- $common := printf `id="%s" data-path="%s" aria-describedby="%s-hint %s-error"` $id .path $id $id }}
+  {{- if eq .type "textarea" }}
+  <textarea class="CfpForm__input" {{ $common | safeHTMLAttr }} rows="{{ .rows | default 4 }}"{{ if .required }} required{{ end }}{{ with .min }} minlength="{{ . }}"{{ end }}{{ with .max }} maxlength="{{ . }}"{{ end }}{{ with .placeholder }} placeholder="{{ . }}"{{ end }}></textarea>
+  {{- with .max }}<p class="CfpForm__counter" aria-live="polite" data-counter="{{ $id }}"></p>{{ end }}
+  {{- else if eq .type "select" }}
+  <select class="CfpForm__input" {{ $common | safeHTMLAttr }}{{ if .required }} required{{ end }}>
+    <option value="">Выберите…</option>
+    {{- range .options }}<option value="{{ .value }}">{{ .label }}</option>{{ end }}
+  </select>
+  {{- else if eq .type "file" }}
+  <div class="CfpForm__photo">
+    <img class="CfpForm__photoPreview" alt="" hidden data-preview="{{ .path }}">
+    <input class="CfpForm__file" type="file" accept="image/jpeg,image/png" {{ $common | safeHTMLAttr }}{{ if .required }} required{{ end }}>
+  </div>
+  {{- else }}
+  <input class="CfpForm__input" type="{{ .type | default "text" }}" {{ $common | safeHTMLAttr }}{{ if .required }} required{{ end }}{{ with .min }} minlength="{{ . }}"{{ end }}{{ with .max }} maxlength="{{ . }}"{{ end }}{{ with .autocomplete }} autocomplete="{{ . }}"{{ end }}{{ with .placeholder }} placeholder="{{ . }}"{{ end }}>
+  {{- end }}
+  <p class="CfpForm__error" id="{{ $id }}-error" role="alert" hidden></p>
+</div>

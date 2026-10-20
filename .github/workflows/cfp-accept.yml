@@ -1,0 +1,171 @@
+# Публикация на сайте из карточки Trello.
+# Запуск — сервис cfp-function, когда карточку переносят в «Опубликовали спикера ⚡» (mode=speaker)
+# или «Опубликовали доклад ⚡» (mode=talk), либо правят её описание в этих колонках (update=true);
+# или вручную: Actions → «CFP: публикация из карточки» → Run workflow.
+# Что делать, решает tools/cfp_from_trello.py: собрать PR (страница спикера; выступление и спикер)
+# или ничего не делать и объяснить почему (PR уже есть, доклад уже на сайте, ошибочный перенос…).
+# Итог уходит событием в cfp-function: сервис пишет сообщение в чат ПК и возвращает его текст —
+# он же становится комментарием в карточке.
+#
+# Секреты: TRELLO_KEY, TRELLO_TOKEN (служебный аккаунт Trello), EVENTS_SECRET (общий с cfp-function).
+# Переменная: CFP_SERVICE_URL — адрес cfp-function.
+name: "CFP: публикация из карточки"
+
+on:
+  repository_dispatch:
+    types: [cfp-accept]
+  workflow_dispatch:
+    inputs:
+      card:
+        description: Ссылка на карточку Trello или её короткий код
+        required: true
+      mode:
+        description: "Что публиковать: speaker — только спикера, talk — доклад (и спикера, если его ещё нет)"
+        type: choice
+        options: [speaker, talk]
+        default: talk
+      recreate:
+        description: Пересобрать открытый PR из текущей карточки
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: cfp-accept-${{ github.event.client_payload.card || inputs.card }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      CARD: ${{ github.event.client_payload.card || inputs.card }}
+      MODE: ${{ github.event.client_payload.mode || inputs.mode }}
+      UPDATE: ${{ github.event.client_payload.update || false }}
+      FROM: ${{ github.event.client_payload.from || '' }}
+      BY: ${{ github.event.client_payload.by || format('ручной запуск {0}', github.actor) }}
+      RECREATE: ${{ inputs.recreate || false }}
+      TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+      TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+      EVENTS_SECRET: ${{ secrets.EVENTS_SECRET }}
+      CFP_SERVICE_URL: ${{ vars.CFP_SERVICE_URL }}
+      GH_TOKEN: ${{ github.token }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      SUMMARY: /tmp/cfp-summary.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Install Hugo and PyYAML
+        run: |
+          v=$(cat .hugo-version)
+          curl -fsSL -o /tmp/hugo.deb "https://github.com/gohugoio/hugo/releases/download/v${v}/hugo_extended_${v}_linux-amd64.deb"
+          sudo dpkg -i /tmp/hugo.deb
+          pip install --quiet pyyaml
+
+      # Событие в cfp-function (сообщение в чат) и тот же текст — комментарием в карточку.
+      # $1 — jq-выражение поверх итога скрипта, например '. + {prUrl: $pr}'
+      - name: Event helper
+        run: |
+          cat > /tmp/cfp-event.sh <<'EOF'
+          report() {
+            jq --arg run "$RUN_URL" --arg pr "${PR:-}" "${1:-.} | {kind, reason, mode, from, by, title, speakers,
+                cardUrl, prUrl, paths, notes, message, runUrl: \$run}" "$SUMMARY" > /tmp/event.json
+            text=$(curl -fsS -X POST -H "Authorization: Bearer $EVENTS_SECRET" -H "Content-Type: application/json" \
+              --data @/tmp/event.json "$CFP_SERVICE_URL/api/events" | jq -r .text) || text=""
+            if [ -z "$text" ]; then
+              text="$(jq -r '.kind + ": " + (.message // .prUrl // .reason // "")' /tmp/event.json) ($RUN_URL)"
+            fi
+            python3 tools/cfp_from_trello.py comment --card "$CARD" --text "$text" || true
+          }
+          EOF
+
+      - name: Decide and build pages
+        run: |
+          flags=()
+          [ "$UPDATE" = "true" ] && flags+=(--update)
+          [ "$RECREATE" = "true" ] && flags+=(--recreate)
+          python3 tools/cfp_from_trello.py run --card "$CARD" --mode "$MODE" --from "$FROM" --by "$BY" \
+            "${flags[@]}" --summary "$SUMMARY"
+          echo "ACTION=$(jq -r .action "$SUMMARY")" >> "$GITHUB_ENV"
+
+      - name: Nothing to build — explain
+        if: env.ACTION == 'skip'
+        run: |
+          source /tmp/cfp-event.sh
+          report
+
+      - name: Site checks
+        if: env.ACTION == 'build'
+        run: |
+          python3 tools/check_refs.py
+          hugo --gc --minify --panicOnWarning --destination /tmp/snowone-check >/dev/null
+
+      - name: Branch and PR
+        if: env.ACTION == 'build'
+        run: |
+          branch=$(jq -r .branch "$SUMMARY")
+          existing=$(jq -r '.prUrl // ""' "$SUMMARY")
+          cfp_id=$(jq -r .cfp_id "$SUMMARY")
+          card_url=$(jq -r .cardUrl "$SUMMARY")
+          names=$(jq -r '.speakers | join(", ")' "$SUMMARY")
+          if [ "$MODE" = "speaker" ]; then
+            title="CFP: спикер $names"
+            what="Спикер $names опубликован раньше выступления: на его странице — «Описание выступления появится здесь позже»."
+          else
+            title="CFP: $(jq -r .title "$SUMMARY")"
+            what="Выступление «$(jq -r .title "$SUMMARY")» ($names). Публикуется без расписания: день, время и зал проставляются позже."
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add content
+          git commit -q -m "$title" -m "Заявка $cfp_id, карточка $card_url"
+          # Ветки cfp/<номер>-<режим> принадлежат этому workflow, пересоздание — принудительный push
+          git push --force origin "$branch"
+          {
+            echo "$what"
+            echo
+            echo "Карточка: $card_url (заявка $cfp_id)."
+            echo
+            echo "Изменения:"
+            jq -r '.created[] | "- `" + . + "`"' "$SUMMARY"
+            if [ "$(jq '.notes | length' "$SUMMARY")" != "0" ]; then
+              echo
+              echo "**Проверьте:**"
+              jq -r '.notes[] | "- " + .' "$SUMMARY"
+            fi
+            echo
+            echo "Проверки сайта (\`check_refs.py\`, сборка Hugo) пройдены в [запуске]($RUN_URL): PR от GitHub Actions не запускает их сам."
+            echo "Правки текста — в карточке: пока PR открыт, правка описания карточки пересобирает его."
+          } > /tmp/pr-body.md
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$title" --body-file /tmp/pr-body.md
+            url="$existing"
+          else
+            url=$(gh pr create --head "$branch" --base "$DEFAULT_BRANCH" --title "$title" --body-file /tmp/pr-body.md)
+          fi
+          supersede=$(jq -r '.supersede // ""' "$SUMMARY")
+          if [ -n "$supersede" ]; then
+            gh pr close "$supersede" --delete-branch --comment "Заменён PR $url: в нём и спикер, и доклад."
+            jq --arg old "$supersede" '.notes += ["PR только со спикером (" + $old + ") закрыт: спикер вошёл в этот PR."]' \
+              "$SUMMARY" > /tmp/s.json && mv /tmp/s.json "$SUMMARY"
+          fi
+          echo "PR=$url" >> "$GITHUB_ENV"
+
+      - name: Report the PR
+        if: env.ACTION == 'build'
+        run: |
+          source /tmp/cfp-event.sh
+          report '. + {prUrl: $pr}'
+
+      - name: Report the failure
+        if: failure()
+        run: |
+          [ -s "$SUMMARY" ] || jq -n --arg card "$CARD" '{title: $card, cardUrl: ("https://trello.com/c/" + $card)}' > "$SUMMARY"
+          source /tmp/cfp-event.sh
+          report '. + {kind: "error", message: (if .ok == false then .message else "сбой на шаге проверки или публикации, подробности в запуске" end)}'
