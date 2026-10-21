@@ -14,7 +14,7 @@
     {{ partial "cfp-field.html" (dict "path" (print $p "company") "label" "Компания" "max" 100 "autocomplete" (cond (eq $i 0) "organization" "off")) }}
     {{ partial "cfp-field.html" (dict "path" (print $p "position") "label" "Должность или род деятельности" "required" true "max" 100) }}
   </div>
-  {{ partial "cfp-field.html" (dict "path" (print $p "bio") "label" "О себе" "type" "textarea" "required" true "min" 100 "max" 2000 "rows" 5 "hint" "Пара абзацев для страницы спикера: чем занимаетесь, что интересно.") }}
+  {{ partial "cfp-field.html" (dict "path" (print $p "bio") "label" "О себе" "type" "textarea" "required" true "min" 50 "max" 2000 "rows" 5 "hint" "Пара абзацев для страницы спикера: чем занимаетесь, что интересно.") }}
   {{ partial "cfp-field.html" (dict "path" (print $p "photo") "label" "Фото" "type" "file" "required" true "hint" "JPEG или PNG, лучше квадратное; уменьшим до 1200 пикселей перед отправкой.") }}
   <div class="CfpForm__row">
     {{ partial "cfp-field.html" (dict "path" (print $p "website") "label" "Сайт или блог" "type" "url" "max" 300 "placeholder" "https://") }}
