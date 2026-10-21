@@ -234,9 +234,36 @@ def mark_season(path, season):
         fh.write("---" + head + f"\nseason: {season}" + sep + rest)
 
 
+FILLABLE = {"company": "компания", "position": "должность"}
+
+
+def fill_missing(path, sp):
+    """Дополняет существующую персону пустыми у неё полями из карточки: компания, должность, текст «О себе».
+    Заполненное, фото и остальной файл не меняются. → названия дополненных полей."""
+    fm = front(path)
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
+    head, sep, rest = text[3:].partition("\n---")
+    filled = []
+    for key, label in FILLABLE.items():
+        if sp.get(key) and not str(fm.get(key) or "").strip():
+            line = yaml.safe_dump({key: sp[key]}, allow_unicode=True, width=10000).strip()
+            head = re.sub(rf"^{key}:.*\n?", "", head, flags=re.M).rstrip("\n") + "\n" + line
+            filled.append(label)
+    body = rest.partition("\n")[2] if rest.startswith("\n") else rest
+    if sp.get("bio") and not body.strip():
+        rest = "\n\n" + sp["bio"].strip() + "\n"
+        filled.append("«О себе»")
+    if filled:
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write("---" + head + sep + rest)
+    return filled
+
+
 def build_persons(card, photos, content, season, mode):
-    """Страницы спикеров. Новые персоны получают season; в режиме speaker уже известным
-    (выступали раньше) season дописывается, биография и фото не меняются. → (ids, изменения, заметки)"""
+    """Страницы спикеров. Новые персоны получают season; уже известным (выступали раньше) пустые компания,
+    должность и «О себе» дополняются из карточки, а в режиме speaker дописывается season; заполненное и фото
+    не меняются. → (ids, изменения, заметки)"""
     notes, changed, ids = [], [], []
     persons_dir = os.path.join(content, "persons")
     known = known_persons(content)
@@ -247,10 +274,13 @@ def build_persons(card, photos, content, season, mode):
             rel = f"content/persons/{existing['id']}/"
             if existing["season"] == season:
                 continue
-            notes.append(f"Спикер «{sp['name']}» уже есть на сайте ({rel}): проверьте, тот ли это человек, "
-                         "и при необходимости обновите биографию и фото вручную.")
+            filled = fill_missing(existing["path"], sp)
+            notes.append(f"Спикер «{sp['name']}» уже есть на сайте ({rel}): проверьте, тот ли это человек"
+                         + (f"; из карточки дополнено: {', '.join(filled)}" if filled else "")
+                         + ". Заполненные раньше поля и фото не менялись — при необходимости обновите вручную.")
             if mode == "speaker":
                 mark_season(existing["path"], season)
+            if mode == "speaker" or filled:
                 changed.append(rel)
             continue
         if sp["number"] not in photos:

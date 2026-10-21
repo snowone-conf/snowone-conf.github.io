@@ -178,12 +178,14 @@ class BuildTest(unittest.TestCase):
             fh.write("---\ntitle: Иван Иванов\n---\nСтарая биография\n")
         os.makedirs(os.path.join(self.tmp, "talks", "e6d2f30de02643beb583279cd9d68bcb---virtualnye-potoki-v-prodakshene"))
         created, notes = cft.build(cft.parse_card(CARD), {}, self.tmp, 2027)
-        self.assertEqual(created, ["content/talks/e6d2f30de02643beb583279cd9d68bcb---virtualnye-potoki-v-prodakshene-2/"])
+        self.assertEqual(created, ["content/persons/e6d2f30de02643beb583279cd9d68bcb/",
+                                   "content/talks/e6d2f30de02643beb583279cd9d68bcb---virtualnye-potoki-v-prodakshene-2/"])
         self.assertEqual(len(notes), 2)
         self.assertIn("уже есть на сайте", notes[0])
+        self.assertIn("из карточки дополнено: компания, должность.", notes[0])
         self.assertIn("-2/", notes[1])
         self.assertEqual(self.read("persons/e6d2f30de02643beb583279cd9d68bcb/index.ru.md"),
-                         "---\ntitle: Иван Иванов\n---\nСтарая биография\n")
+                         "---\ntitle: Иван Иванов\ncompany: Компания\nposition: Ведущий разработчик\n---\nСтарая биография\n")
 
     def test_second_speaker_and_missing_photo(self):
         card = cft.parse_card(with_second())
@@ -219,7 +221,7 @@ class SpeakerModeTest(unittest.TestCase):
         self.assertTrue(cft.speakers_published(self.card, self.tmp, 2027))
         self.assertFalse(cft.speakers_published(self.card, self.tmp, 2028))
 
-    def test_returning_speaker_gets_season_only(self):
+    def test_returning_speaker_gets_season_and_missing_fields(self):
         old = os.path.join(self.tmp, "persons", "e6d2f30de02643beb583279cd9d68bcb")
         os.makedirs(old)
         original = "---\ntitle: Иван Иванов\nweight: 200\nseason: 2026\nphoto: photo.png\n---\n<p>Старая биография</p>\n"
@@ -230,8 +232,26 @@ class SpeakerModeTest(unittest.TestCase):
         self.assertIn("уже есть на сайте", notes[0])
         with open(os.path.join(old, "index.ru.md"), encoding="utf-8") as fh:
             self.assertEqual(fh.read(), original.replace("season: 2026\n", "").replace(
-                "photo: photo.png\n", "photo: photo.png\nseason: 2027\n"))
+                "photo: photo.png\n", "photo: photo.png\ncompany: Компания\nposition: Ведущий разработчик\nseason: 2027\n"))
         self.assertTrue(cft.speakers_published(self.card, self.tmp, 2027))
+
+    def test_filled_fields_are_kept_and_empty_bio_is_added(self):
+        old = os.path.join(self.tmp, "persons", "e6d2f30de02643beb583279cd9d68bcb")
+        os.makedirs(old)
+        with open(os.path.join(old, "index.ru.md"), "w", encoding="utf-8") as fh:
+            fh.write("---\ntitle: Иван Иванов\ncompany: Старая компания\nposition: ''\n---\n")
+        changed, notes = cft.build(self.card, {}, self.tmp, 2027, "speaker")
+        self.assertIn("из карточки дополнено: должность, «О себе».", notes[0])
+        text = self.read_person(old)
+        self.assertTrue(text.startswith("---\ntitle: Иван Иванов\ncompany: Старая компания\n"
+                                        "position: Ведущий разработчик\nseason: 2027\n---\n\n"), text)
+        self.assertIn(self.card["speakers"][0]["bio"].strip(), text)
+        self.assertEqual(cft.front(os.path.join(old, "index.ru.md"))["company"], "Старая компания")
+
+    @staticmethod
+    def read_person(folder):
+        with open(os.path.join(folder, "index.ru.md"), encoding="utf-8") as fh:
+            return fh.read()
 
     def test_published_talks_by_cfp_id(self):
         cft.build(cft.parse_card(CARD), {1: (JPEG, "jpg")}, self.tmp, 2027)
