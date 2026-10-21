@@ -1,0 +1,18 @@
+{{- /*
+  Форма заявки /callforpapers/apply/ существует, только пока открыт приём заявок (params.cfp.open в hugo.yaml).
+  При закрытом приёме страницы нет совсем: по прямому адресу — 404, в sitemap её нет.
+*/ -}}
+{{- if site.Params.cfp.open }}
+  {{- $intro := `Расскажите о выступлении и о себе. Программный комитет прочитает заявку и свяжется с вами.
+
+Всё, кроме контактов и города, после принятия в программу появится на сайте, включая компанию, фото и ссылки на профили (если есть).` }}
+  {{- .AddPage (dict
+    "path" "apply"
+    "title" "Заявка на выступление"
+    "layout" "cfp-apply"
+    "params" (dict
+      "seoTitle" "SnowOne 2027 | Заявка на выступление"
+      "ogImage" "/img/site/snowone-cfp.jpg"
+      "description" "Форма заявки на выступление на конференции SnowOne 2027.")
+    "content" (dict "mediaType" "text/markdown" "value" $intro)) }}
+{{- end }}

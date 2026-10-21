@@ -84,7 +84,7 @@ make import-cfp FILE=export.xlsx ARGS="--only 12,15"      # только при�
 
 **Билеты (Timepad):** в `hugo.yaml` укажите `params.tickets.mode: link` и `params.tickets.url` — в шапке и на главной появится кнопка «Купить билет».
 
-**CFP:** `params.cfp.open` включает и выключает кнопки «Стать спикером» и «Подать заявку», а `params.cfp.url` задаёт ссылку на форму.
+**CFP:** `params.cfp.open` включает и выключает приём заявок целиком: ссылку «Стать спикером» в шапке, кнопку «Подать заявку» и саму форму `/callforpapers/apply/` (при `false` её нет и по прямому адресу — страницу создаёт `content/callforpapers/_content.gotmpl` только при открытом приёме). Текст согласия — `/callforpapers/consent/`; при его правке поднимите `params.cfp.consentVersion`.
 
 **Своя аналитика:** номер счётчика Яндекс Метрики — в `params.yandexMetrikaId`. Счётчик подключится на всех страницах, включая архив, и появится баннер согласия на cookies.
 

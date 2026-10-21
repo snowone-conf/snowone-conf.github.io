@@ -36,12 +36,13 @@ params:
     url: https://timepad.ru/
   # Приём докладов (CFP)
   cfp:
+    # Приём заявок: true — «Стать спикером» в шапке и форма /callforpapers/apply/;
+    # false — ни ссылки, ни формы (страницы нет и по прямому адресу).
     open: true
-    url: "mailto:support@snowone.ru?subject=SnowOne%20CFP"  # на запуске — /callforpapers/apply/
-    # Форма заявки /callforpapers/apply/ отправляет заявки в сервис cfp-function (Cloud.ru).
+    # Форма заявки отправляет заявки в сервис cfp-function (Cloud.ru).
     api: https://cfp-function.containerapps.ru
     # Версия текста согласия /callforpapers/consent/: сохраняется вместе с заявкой. Меняйте при правке текста.
-    consentVersion: "2026-10"
+    consentVersion: "2026-10-21"
   # Подписка на новости: кнопка ведёт в Telegram-канал. Пусто — баннера нет.
   subscription:
     url: https://t.me/snowone_news
