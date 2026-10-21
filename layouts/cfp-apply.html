@@ -3,9 +3,6 @@
 <div class="CallforpapersContent_callforpapersContent__9ac97">
   <div class="CallforpapersContent_callforpapersContent__container__kmO80 CfpForm__page">
     <h1 class="CfpForm__title">{{ .Title }}</h1>
-    {{- if not $cfp.open }}
-    <p class="SitePlaceholder">Приём заявок закрыт. Следите за новостями в <a href="{{ site.Params.subscription.url }}">Telegram-канале</a>.</p>
-    {{- else }}
     <div class="CfpForm__intro">{{ .Content }}</div>
 
     <form class="CfpForm" novalidate data-cfp-form data-api="{{ $cfp.api }}" data-consent-version="{{ $cfp.consentVersion }}">
@@ -48,7 +45,7 @@
         </div>
         <div class="CfpForm__field" data-field="consents.publication">
           <label class="CfpForm__check"><input type="checkbox" data-path="consents.publication" required>
-            <span>Если заявку примут, разрешаю опубликовать на сайте имя, компанию, должность, биографию, фото, ссылки и описание выступления (<a href="/callforpapers/consent/#6-согласие-на-публикацию" target="_blank">подробнее</a>)<span class="CfpForm__required" aria-hidden="true"> *</span></span></label>
+            <span>Если заявку примут, разрешаю опубликовать на сайте имя, компанию, должность, сведения о себе, фото, ссылки и описание выступления (<a href="/callforpapers/consent/#7-согласие-на-публикацию" target="_blank">подробнее</a>)<span class="CfpForm__required" aria-hidden="true"> *</span></span></label>
           <p class="CfpForm__error" role="alert" hidden></p>
         </div>
       </div>
@@ -65,12 +62,9 @@
       <p>Номер заявки — <strong data-done-id></strong>. Программный комитет прочитает её и свяжется с вами.</p>
       <p>Если что-то нужно поправить, напишите на <a href="mailto:{{ hugo.Data.conference.contacts.support }}">{{ hugo.Data.conference.contacts.support }}</a> и укажите номер заявки.</p>
     </div>
-    {{- end }}
   </div>
 </div>
-{{- if $cfp.open }}
 {{ with resources.Get "js/cfp-form.js" | js.Build (dict "minify" true) | fingerprint }}
 <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" defer></script>
 {{ end }}
-{{- end }}
 {{ end }}

@@ -1,1 +1,2 @@
-{{- if site.Params.cfp.open }}<a class="CallforpapersLink_callforpapersLink__submit__mEtMo" href="{{ site.Params.cfp.url }}" target="_blank">Подать заявку</a>{{ else }}<span class="CallforpapersLink_callforpapersLink__submit__mEtMo" aria-disabled="true">Приём заявок закрыт</span>{{ end -}}
+{{- /* Страница формы есть, только пока открыт приём заявок (content/callforpapers/_content.gotmpl) */ -}}
+{{- with site.GetPage "/callforpapers/apply" }}<a class="CallforpapersLink_callforpapersLink__submit__mEtMo" href="{{ .RelPermalink }}">Подать заявку</a>{{ else }}<span class="CallforpapersLink_callforpapersLink__submit__mEtMo" aria-disabled="true">Приём заявок закрыт</span>{{ end -}}
