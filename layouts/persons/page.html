@@ -16,9 +16,7 @@
       </div>
       <div class="PersonContent_personContent__rightColumn__EUrbo">
         <h1 class="PersonContent_personContent__title__txWO3">{{ .Title }}</h1>
-        {{- with .Params.company }}
-        <p class="PersonContent_personContent__company__8Sj_x"><span class="PersonContent_personContent__companyLabel__CGMi_">Компания: </span>{{ . }}</p>
-        {{- end }}
+        {{- partial "person-role.html" (dict "person" . "class" "PersonContent_personContent__company__8Sj_x") }}
         <div class="PersonContent_personContent__text__9exho">{{ .Content }}</div>
         {{- with .Params.contacts }}
         <ul class="PersonContent_personContent__contacts___2Kek PersonContacts_personContacts__xfl6U">
