@@ -7,7 +7,7 @@
       {{ partial "avatar.html" (dict "person" . "size" 62 "class" "PersonCard_personCard__avatar__79hPV") }}
       <div>
         <h3 class="PersonCard_personCard__name__osiAC"><a data-link="true" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-        {{- if and .Params.position .Params.company }}<p class="PersonCard_personCard__company__aVHAn"><span class="PersonCard_personCard__companyLabel__6fEBX">Компания: </span>{{ .Params.company }}</p>{{ end }}
+        {{- partial "person-role.html" (dict "person" . "class" "PersonCard_personCard__company__aVHAn") }}
       </div>
     </article>
   </li>

@@ -25,6 +25,6 @@
   <div class="CfpForm__row CfpForm__row_three">
     {{ partial "cfp-field.html" (dict "path" (print $p "email") "label" "E-mail" "type" "email" "required" (eq $i 0) "max" 254 "autocomplete" (cond (eq $i 0) "email" "off")) }}
     {{ partial "cfp-field.html" (dict "path" (print $p "phone") "label" "Телефон" "type" "tel" "max" 30 "autocomplete" (cond (eq $i 0) "tel" "off")) }}
-    {{ partial "cfp-field.html" (dict "path" (print $p "telegram") "label" "Telegram" "max" 100 "placeholder" "@nick") }}
+    {{ partial "cfp-field.html" (dict "path" (print $p "telegram") "label" "Telegram" "required" (eq $i 0) "max" 100 "placeholder" "@nick") }}
   </div>
 </fieldset>
