@@ -53,8 +53,8 @@ menus:
   main:
     - {name: Спикеры, url: /speakers/, weight: 20}
     - {name: Партнеры, url: /partners/, weight: 30}
-    - {name: О нас, url: /organizers/, weight: 40}
+    - {name: Организаторы, url: /organizers/, weight: 40}
     - {name: Архив, url: /archive/, weight: 50}
-    - {name: Code of Conduct, url: /coc/, weight: 60}
+    - {name: Правила, url: /coc/, weight: 60}
     # Правила участия пока скрыты (draft: true в content/rules/) — вернуть вместе со страницей:
     # - {name: Правила участия, url: /rules/, weight: 70}

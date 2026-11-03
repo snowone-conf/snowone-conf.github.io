@@ -1,8 +1,8 @@
 ---
 title: Организаторы
 layout: organizers
-seoTitle: SnowOne 2026 | Организаторы | JUGNsk
-organizer: JUGNsk
+seoTitle: SnowOne 2027 | Организаторы
+organizer: Сообщество JUGNsk
 logo: /img/site/jugnsk-logo.jpg
 link: https://t.me/jugnsk
 ---
