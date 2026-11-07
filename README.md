@@ -41,7 +41,7 @@ make serve          # или: hugo server -D
 | `content/persons/<id>/index.ru.md` + `photo.*` | докладчики, ведущие, члены ПК; текст — биография |
 | `content/partners/<slug>/index.ru.md` + `logo.*` | партнёры: уровень (`tier`), порядок (`weight`), ссылки |
 | `content/<страница>/index.ru.md` | текстовые страницы: CoC, правила (пока скрыты), CFP, «О нас». Юридические документы сезона 2026 — только в архиве `/archive/2026/` |
-| `hugo.yaml` | настройки сайта: меню, билеты, CFP, аналитика |
+| `hugo.yaml` | настройки сайта: меню, билеты, регистрация, CFP, аналитика |
 | `layouts/` | шаблоны страниц (разметка и классы прежнего сайта) |
 | `assets/css/platform/` | стили прежнего сайта; свои правки — в `assets/css/site.css` |
 | `assets/js/site.js` | меню, «Еще», баннер cookies |
@@ -82,7 +82,9 @@ make import-cfp FILE=export.xlsx ARGS="--only 12,15"      # только при�
 
 **Слайды:** PDF хранятся в GitHub Releases, по релизу на год (`slides-2026`, …). Загрузите файл в релиз и укажите ссылку в поле `slides` доклада.
 
-**Билеты (Timepad):** в `hugo.yaml` укажите `params.tickets.mode: link` и `params.tickets.url` — в шапке и на главной появится кнопка «Купить билет».
+**Билеты (Timepad):** в `hugo.yaml` укажите `params.tickets.mode: link` и `params.tickets.url` — в шапке, в том числе в мобильном меню, появится кнопка «Купить билет». Её доступность тоже зависит от `params.registration.open`: при `false` кнопка заблокирована, при `true` ведёт на `params.tickets.url`. При `params.tickets.mode: off` кнопка скрыта.
+
+**Регистрация участников:** в `hugo.yaml` блок `params.registration` управляет кнопкой «Регистрация» на главной: `open: true` — активная ссылка на `url`; `open: false` — кнопка видна, но заблокирована (без ссылки и возможности нажатия). При закрытой регистрации справа от кнопки отображается ненавязчивый текст из `closedMessage`, например «Регистрация скоро откроется». Пустой `closedMessage` скрывает пояснение; при открытой регистрации оно не отображается.
 
 **CFP:** `params.cfp.open` включает и выключает приём заявок целиком: ссылку «Стать спикером» в шапке, кнопку «Подать заявку» и саму форму `/callforpapers/apply/` (при `false` её нет и по прямому адресу — страницу создаёт `content/callforpapers/_content.gotmpl` только при открытом приёме). Текст согласия — `/callforpapers/consent/`; при его правке поднимите `params.cfp.consentVersion`.
 

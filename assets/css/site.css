@@ -25,6 +25,13 @@ a.SubscriptionBanner_subscriptionBanner__button__qcGvg {
 .HeroBadges { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin-top: 8px; }
 .HeroBadges .HeroLabel_heroLabel__label__c_vd9 { margin-bottom: 0; }
 
+/* Причина закрытия регистрации справа от кнопки, в том числе на узких экранах. */
+.HomeRegistration { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; column-gap: 16px; }
+.HomeRegistration .HomeHero_homeHero__link__1349P:disabled {
+  --background-color: var(--color-gradient); opacity: .5; cursor: not-allowed;
+}
+.HomeRegistration__message { margin: 0; font-size: 14px; line-height: 1.5; color: #aeb7c2; overflow-wrap: anywhere; }
+
 /* Заглушка раздела без данных («Скоро здесь появятся…») */
 .SitePlaceholder {
   margin: 0; padding: 48px 24px; text-align: center;

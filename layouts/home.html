@@ -23,9 +23,17 @@
               </p>
             </div>
           </div>
-          <div class="HomeHero_homeHero__links__ap9hW">
-            {{- with site.Params.registration.url }}
+          {{- $registration := site.Params.registration -}}
+          <div class="HomeHero_homeHero__links__ap9hW{{ if not $registration.open }} HomeRegistration{{ end }}">
+            {{- if $registration.open }}
+            {{- with $registration.url }}
             <a class="HomeHero_homeHero__link__1349P" href="{{ . }}" target="_blank" rel="noopener">Регистрация</a>
+            {{- end }}
+            {{- else }}
+            <button class="HomeHero_homeHero__link__1349P" type="button" disabled{{ with $registration.closedMessage }} aria-describedby="registration-closed-message"{{ end }}>Регистрация</button>
+            {{- with $registration.closedMessage }}
+            <p class="HomeRegistration__message" id="registration-closed-message">{{ . }}</p>
+            {{- end }}
             {{- end }}
           </div>
         </div>
