@@ -9,7 +9,11 @@
   <li><a class="HeaderImportantLinks_headerImportantLinks__link_highlight__d0FH6 HeaderImportantLinks_headerImportantLinks__link__x8zW2" href="/callforpapers/"><svg width="24" height="24" focusable="false" aria-hidden="true"><use href="/img/sprite.svg#speaker"></use></svg><span>Стать спикером</span></a></li>
   {{- end }}
   {{- if and (ne site.Params.tickets.mode "off") site.Params.tickets.url }}
+  {{- if site.Params.registration.open }}
   <li><a class="HeaderImportantLinks_headerImportantLinks__link__x8zW2" href="{{ site.Params.tickets.url }}" target="_blank" rel="noopener"><span>Купить билет</span></a></li>
+  {{- else }}
+  <li><button class="HeaderImportantLinks_headerImportantLinks__link__x8zW2" type="button" disabled><span>Купить билет</span></button></li>
+  {{- end }}
   {{- end }}
 {{- end -}}
 <header class="Layout_layout__header__182X3 Header_header___vw_L">
